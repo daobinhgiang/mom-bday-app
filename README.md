@@ -62,6 +62,72 @@ This is a static site. Any static host works:
 - Add actual audio playback for the music room
 - Add Vietnamese diacritics toggle for proper text display
 
+## Developer Tooling (Claude Code)
+
+This project uses [Claude Code](https://claude.ai/code) as the primary development tool. Below is how to set up the MCP integrations and GitHub connection for new engineers.
+
+### Connecting GitHub to Claude Code
+
+1. Install the GitHub CLI:
+   ```bash
+   brew install gh
+   ```
+2. Authenticate with your GitHub account:
+   ```bash
+   gh auth login
+   ```
+3. Claude Code automatically picks up `gh` for creating issues, PRs, and managing the repo — no additional configuration needed.
+
+### Setting Up Playwright MCP
+
+Playwright MCP lets Claude Code control a browser to visually test the app, click through rooms, and take screenshots.
+
+1. Add the Playwright MCP server to your Claude Code settings (`~/.claude/settings.json` or project `.claude/settings.json`):
+   ```json
+   {
+     "mcpServers": {
+       "playwright": {
+         "command": "npx",
+         "args": ["@anthropic-ai/mcp-playwright"]
+       }
+     }
+   }
+   ```
+2. Restart Claude Code. You should see Playwright tools available (e.g. `browser_navigate`, `browser_snapshot`, `browser_click`).
+3. Usage example — ask Claude Code:
+   - "Open index.html in the browser and take a screenshot"
+   - "Click the door to open it, then navigate to the Music Room"
+   - "Check if the app is responsive at 375px width"
+
+### Setting Up Context7 MCP
+
+Context7 fetches up-to-date library documentation so Claude Code has accurate API references.
+
+1. Add to your Claude Code settings:
+   ```json
+   {
+     "mcpServers": {
+       "context7": {
+         "command": "npx",
+         "args": ["-y", "@anthropic-ai/context7-mcp@latest"]
+       }
+     }
+   }
+   ```
+2. Claude Code will automatically use this when you ask about library APIs (e.g. Google Drive API, Web Audio API).
+
+### Other Useful MCP Servers
+
+| MCP Server | Purpose |
+|------------|---------|
+| **Playwright** | Browser automation, visual testing, screenshots |
+| **Context7** | Up-to-date library/API documentation |
+| **Slack** | Send updates to team channels |
+| **Google Calendar** | Schedule collaboration sessions |
+| **Notion** | Sync project docs and notes |
+
+> **Tip**: Run `/help` inside Claude Code to see all available tools and MCP connections.
+
 ## Tech Stack
 
 - Pure HTML/CSS/JS (no frameworks)
