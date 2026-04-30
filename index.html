@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ngoi Nha cua Me</title>
+<title>Ngôi Nhà của Mẹ</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Quicksand:wght@400;600&display=swap');
 
@@ -12,7 +12,7 @@
   body {
     font-family: 'Quicksand', sans-serif;
     background: #1a1a2e;
-    color: #f5f0e8;
+    color: black;
     overflow-x: hidden;
   }
 
@@ -351,71 +351,71 @@
   <div class="door-frame">
     <div class="peephole"></div>
   </div>
-  <div class="door-text">Go vao nha Me</div>
-  <div class="door-subtitle">nhan de mo cua</div>
+  <div class="door-text">Gõ vào nhà Mẹ</div>
+  <div class="door-subtitle">nhấn để mở cửa</div>
 </div>
 
 <!-- MAIN APP -->
 <div id="app">
   <header>
-    <h1>Ngoi Nha cua Me</h1>
-    <p>Mot ngoi nha day ky niem</p>
+    <h1>Ngôi Nhà của Mẹ</h1>
+    <p>Một ngôi nhà đầy kỷ niệm</p>
   </header>
 
   <!-- ROOM NAVIGATION -->
   <div class="house-nav" id="house-nav">
     <div class="room-card" onclick="showRoom('library')">
       <span class="icon">&#128218;</span>
-      <h3>Thu Vien</h3>
-      <p>Ky niem tu gia dinh</p>
+      <h3>Thư Viện</h3>
+      <p>Kỷ niệm từ gia đình</p>
     </div>
     <div class="room-card" onclick="showRoom('music')">
       <span class="icon">&#127926;</span>
-      <h3>Phong Nhac</h3>
-      <p>Nhung bai hat danh cho Me</p>
+      <h3>Phòng Nhạc</h3>
+      <p>Những bài hát dành cho Mẹ</p>
     </div>
     <div class="room-card" onclick="showRoom('map')">
       <span class="icon">&#127758;</span>
-      <h3>Phong Ban Do</h3>
-      <p>Nhung noi Me da den</p>
+      <h3>Phòng Bản Đồ</h3>
+      <p>Những nơi Mẹ đã đến</p>
     </div>
     <div class="room-card" onclick="showRoom('family')">
       <span class="icon">&#128248;</span>
-      <h3>Phong Gia Dinh</h3>
-      <p>Anh va hinh ve cua chau</p>
+      <h3>Phòng Gia Đình</h3>
+      <p>Ảnh và hình vẽ của cháu</p>
     </div>
   </div>
 
   <!-- LIBRARY -->
   <div class="room-panel" id="room-library">
-    <button class="back-btn" onclick="goHome()">&larr; Ve nha</button>
-    <h2>Thu Vien</h2>
-    <p class="room-desc">Moi cuon sach la mot bo suu tap ky niem tu mot nguoi trong gia dinh.</p>
+    <button class="back-btn" onclick="goHome()">&larr; Về nhà</button>
+    <h2>Thư Viện</h2>
+    <p class="room-desc">Mỗi cuốn sách là một bộ sưu tập kỷ niệm từ một người trong gia đình.</p>
     <div class="bookshelf">
       <div class="book">
-        <h4>Cuon sach cua Con Trai</h4>
-        <p>"Me oi, con nho ngay Me dua con di hoc ngay dau tien..."</p>
+        <h4>Cuốn sách của Con Trai</h4>
+        <p>"Mẹ ơi, con nhớ ngày Mẹ đưa con đi học ngày đầu tiên..."</p>
       </div>
       <div class="book">
-        <h4>Cuon sach cua Con Gai</h4>
-        <p>"Me luon la nguoi dau tien con goi khi con can loi khuyen..."</p>
+        <h4>Cuốn sách của Con Gái</h4>
+        <p>"Mẹ luôn là người đầu tiên con gọi khi con cần lời khuyên..."</p>
       </div>
       <div class="book">
-        <h4>Cuon sach cua Chau</h4>
-        <p>"Ba ngoai nau an ngon nhat the gioi!"</p>
+        <h4>Cuốn sách của Cháu</h4>
+        <p>"Bà ngoại nấu ăn ngon nhất thế giới!"</p>
       </div>
       <div class="book">
-        <h4>Cuon sach cua Gia Dinh</h4>
-        <p>"Nhung bua com chieu cuoi tuan cung nhau..."</p>
+        <h4>Cuốn sách của Gia Đình</h4>
+        <p>"Những bữa cơm chiều cuối tuần cùng nhau..."</p>
       </div>
     </div>
   </div>
 
   <!-- MUSIC ROOM -->
   <div class="room-panel" id="room-music">
-    <button class="back-btn" onclick="goHome()">&larr; Ve nha</button>
-    <h2>Phong Nhac</h2>
-    <p class="room-desc">Nhung bai hat ma moi nguoi lien tuong den Me, kem loi nhan yeu thuong.</p>
+    <button class="back-btn" onclick="goHome()">&larr; Về nhà</button>
+    <h2>Phòng Nhạc</h2>
+    <p class="room-desc">Những bài hát mà mọi người liên tưởng đến Mẹ, kèm lời nhắn yêu thương.</p>
     <div class="record-player" id="record">
       <div class="center"></div>
     </div>
@@ -423,22 +423,22 @@
       <li onclick="toggleRecord()">
         <div class="play-icon">&#9654;</div>
         <div class="song-info">
-          <h4>Bong Hong Cai Ao</h4>
-          <p>"Bai hat nay lam con nho Me moi khi nghe" &mdash; Con Trai</p>
+          <h4>Bông Hồng Cài Áo</h4>
+          <p>"Bài hát này làm con nhớ Mẹ mỗi khi nghe" &mdash; Con Trai</p>
         </div>
       </li>
       <li onclick="toggleRecord()">
         <div class="play-icon">&#9654;</div>
         <div class="song-info">
-          <h4>Me Toi</h4>
-          <p>"Me hay hat bai nay ru con ngu" &mdash; Con Gai</p>
+          <h4>Mẹ Tôi</h4>
+          <p>"Mẹ hay hát bài này ru con ngủ" &mdash; Con Gái</p>
         </div>
       </li>
       <li onclick="toggleRecord()">
         <div class="play-icon">&#9654;</div>
         <div class="song-info">
-          <h4>Diem Xua - Khanh Ly</h4>
-          <p>"Bai hat Me nghe nhieu nhat" &mdash; Gia Dinh</p>
+          <h4>Diễm Xưa - Khánh Ly</h4>
+          <p>"Bài hát Mẹ nghe nhiều nhất" &mdash; Gia Đình</p>
         </div>
       </li>
     </ul>
@@ -446,71 +446,71 @@
 
   <!-- MAP ROOM -->
   <div class="room-panel" id="room-map">
-    <button class="back-btn" onclick="goHome()">&larr; Ve nha</button>
-    <h2>Phong Ban Do</h2>
-    <p class="room-desc">Nhung noi Me da song, da ghe tham, va nhung noi Me uoc mo se den.</p>
+    <button class="back-btn" onclick="goHome()">&larr; Về nhà</button>
+    <h2>Phòng Bản Đồ</h2>
+    <p class="room-desc">Những nơi Mẹ đã sống, đã ghé thăm, và những nơi Mẹ ước mơ sẽ đến.</p>
     <div class="map-container">
       <div class="map-legend">
-        <span><span class="dot" style="background:#e17055"></span> Da song</span>
-        <span><span class="dot" style="background:#00b894"></span> Da ghe tham</span>
-        <span><span class="dot" style="background:#a29bfe"></span> Uoc mo</span>
+        <span><span class="dot" style="background:#e17055"></span> Đã sống</span>
+        <span><span class="dot" style="background:#00b894"></span> Đã ghé thăm</span>
+        <span><span class="dot" style="background:#a29bfe"></span> Ước mơ</span>
       </div>
       <div>
-        <span class="map-pin pin-lived"><span class="pin-dot"></span>Sai Gon</span>
-        <span class="map-pin pin-lived"><span class="pin-dot"></span>Ha Noi</span>
-        <span class="map-pin pin-lived"><span class="pin-dot"></span>Hue</span>
-        <span class="map-pin pin-visited"><span class="pin-dot"></span>Da Lat</span>
+        <span class="map-pin pin-lived"><span class="pin-dot"></span>Sài Gòn</span>
+        <span class="map-pin pin-lived"><span class="pin-dot"></span>Hà Nội</span>
+        <span class="map-pin pin-lived"><span class="pin-dot"></span>Huế</span>
+        <span class="map-pin pin-visited"><span class="pin-dot"></span>Đà Lạt</span>
         <span class="map-pin pin-visited"><span class="pin-dot"></span>Nha Trang</span>
-        <span class="map-pin pin-visited"><span class="pin-dot"></span>Hoi An</span>
-        <span class="map-pin pin-visited"><span class="pin-dot"></span>Phu Quoc</span>
+        <span class="map-pin pin-visited"><span class="pin-dot"></span>Hội An</span>
+        <span class="map-pin pin-visited"><span class="pin-dot"></span>Phú Quốc</span>
         <span class="map-pin pin-dream"><span class="pin-dot"></span>Paris</span>
         <span class="map-pin pin-dream"><span class="pin-dot"></span>Tokyo</span>
-        <span class="map-pin pin-dream"><span class="pin-dot"></span>Ha Long Bay</span>
+        <span class="map-pin pin-dream"><span class="pin-dot"></span>Hạ Long</span>
       </div>
     </div>
   </div>
 
   <!-- FAMILY ROOM -->
   <div class="room-panel" id="room-family">
-    <button class="back-btn" onclick="goHome()">&larr; Ve nha</button>
-    <h2>Phong Gia Dinh</h2>
-    <p class="room-desc">Buc tuong day anh va hinh ve cua cac chau.</p>
+    <button class="back-btn" onclick="goHome()">&larr; Về nhà</button>
+    <h2>Phòng Gia Đình</h2>
+    <p class="room-desc">Bức tường đầy ảnh và hình vẽ của các cháu.</p>
     <div class="photo-wall">
       <div class="photo-frame">
         <div class="photo-placeholder">&#128104;&#8205;&#128105;&#8205;&#128103;&#8205;&#128102;</div>
-        <p>Bua com gia dinh ngay Tet</p>
+        <p>Bữa cơm gia đình ngày Tết</p>
         <div class="author">2024</div>
       </div>
       <div class="photo-frame">
         <div class="photo-placeholder">&#127912;</div>
-        <p>Hinh ve Ba Ngoai cua be Minh</p>
-        <div class="author">Chau ve</div>
+        <p>Hình vẽ Bà Ngoại của bé Minh</p>
+        <div class="author">Cháu vẽ</div>
       </div>
       <div class="photo-frame">
         <div class="photo-placeholder">&#127796;</div>
-        <p>Ky niem di bien cung gia dinh</p>
+        <p>Kỷ niệm đi biển cùng gia đình</p>
         <div class="author">2023</div>
       </div>
       <div class="photo-frame">
         <div class="photo-placeholder">&#127874;</div>
-        <p>Sinh nhat Me nam ngoai</p>
+        <p>Sinh nhật Mẹ năm ngoái</p>
         <div class="author">2025</div>
       </div>
       <div class="photo-frame">
         <div class="photo-placeholder">&#128142;</div>
-        <p>Ngay cuoi cua Ba Me</p>
-        <div class="author">Ky niem</div>
+        <p>Ngày cưới của Ba Mẹ</p>
+        <div class="author">Kỷ niệm</div>
       </div>
       <div class="photo-frame">
         <div class="photo-placeholder">&#9997;&#65039;</div>
-        <p>"Con yeu Ba Ngoai" - be An</p>
-        <div class="author">Chau ve</div>
+        <p>"Con yêu Bà Ngoại" - bé An</p>
+        <div class="author">Cháu vẽ</div>
       </div>
     </div>
   </div>
 
   <footer>
-    <p>Xay voi tinh yeu danh cho Me</p>
+    <p>Xây với tình yêu dành cho Mẹ</p>
   </footer>
 </div>
 
