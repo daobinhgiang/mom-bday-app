@@ -325,6 +325,21 @@
     color: #7f8fa6;
     margin-top: 4px;
   }
+  .photo-frame img {
+    width: 100%; height: 140px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    display: block;
+    background: #4a3f2f;
+  }
+  .photo-status {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 20px;
+    color: #7f8fa6;
+    font-size: 0.95rem;
+  }
 
   /* ── FOOTER ── */
   footer {
@@ -475,37 +490,8 @@
     <button class="back-btn" onclick="goHome()">&larr; Về nhà</button>
     <h2>Phòng Gia Đình</h2>
     <p class="room-desc">Bức tường đầy ảnh và hình vẽ của các cháu.</p>
-    <div class="photo-wall">
-      <div class="photo-frame">
-        <div class="photo-placeholder">&#128104;&#8205;&#128105;&#8205;&#128103;&#8205;&#128102;</div>
-        <p>Bữa cơm gia đình ngày Tết</p>
-        <div class="author">2024</div>
-      </div>
-      <div class="photo-frame">
-        <div class="photo-placeholder">&#127912;</div>
-        <p>Hình vẽ Bà Ngoại của bé Minh</p>
-        <div class="author">Cháu vẽ</div>
-      </div>
-      <div class="photo-frame">
-        <div class="photo-placeholder">&#127796;</div>
-        <p>Kỷ niệm đi biển cùng gia đình</p>
-        <div class="author">2023</div>
-      </div>
-      <div class="photo-frame">
-        <div class="photo-placeholder">&#127874;</div>
-        <p>Sinh nhật Mẹ năm ngoái</p>
-        <div class="author">2025</div>
-      </div>
-      <div class="photo-frame">
-        <div class="photo-placeholder">&#128142;</div>
-        <p>Ngày cưới của Ba Mẹ</p>
-        <div class="author">Kỷ niệm</div>
-      </div>
-      <div class="photo-frame">
-        <div class="photo-placeholder">&#9997;&#65039;</div>
-        <p>"Con yêu Bà Ngoại" - bé An</p>
-        <div class="author">Cháu vẽ</div>
-      </div>
+    <div class="photo-wall" id="photo-wall">
+      <div class="photo-status">Đang tải ảnh...</div>
     </div>
   </div>
 
@@ -527,6 +513,7 @@
   function showRoom(room) {
     document.getElementById('house-nav').style.display = 'none';
     document.getElementById('room-' + room).classList.add('active');
+    if (room === 'family') loadFamilyPhotos();
   }
 
   function goHome() {
@@ -536,6 +523,54 @@
 
   function toggleRecord() {
     document.getElementById('record').classList.toggle('spinning');
+  }
+
+  // ── GOOGLE DRIVE: FAMILY PHOTOS ──
+  const DRIVE_FOLDER_ID = '1yNWI9_fKcAmIcItrkE3KTFYLIneVwq2C';
+  const DRIVE_API_KEY = 'AIzaSyCwFRhJVfUdfj4p1sQ0OHI1yyhSNnEKP7s';
+  let familyPhotosLoaded = false;
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => (
+      {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+    ));
+  }
+
+  async function loadFamilyPhotos() {
+    if (familyPhotosLoaded) return;
+    familyPhotosLoaded = true;
+
+    const wall = document.getElementById('photo-wall');
+    const url = 'https://www.googleapis.com/drive/v3/files'
+      + '?q=' + encodeURIComponent("'" + DRIVE_FOLDER_ID + "' in parents and trashed=false")
+      + '&fields=' + encodeURIComponent('files(id,name,mimeType,description)')
+      + '&orderBy=createdTime+desc'
+      + '&pageSize=100'
+      + '&key=' + DRIVE_API_KEY;
+
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const photos = (data.files || []).filter(f => f.mimeType && f.mimeType.startsWith('image/'));
+
+      if (photos.length === 0) {
+        wall.innerHTML = '<div class="photo-status">Chưa có ảnh trong thư mục.</div>';
+        return;
+      }
+
+      wall.innerHTML = photos.map(f => {
+        const caption = escapeHtml(f.description || f.name.replace(/\.[^.]+$/, ''));
+        const src = 'https://drive.google.com/thumbnail?id=' + f.id + '&sz=w1000';
+        return '<div class="photo-frame">'
+          + '<img src="' + src + '" alt="' + caption + '" loading="lazy">'
+          + '<p>' + caption + '</p>'
+          + '</div>';
+      }).join('');
+    } catch (err) {
+      familyPhotosLoaded = false;
+      wall.innerHTML = '<div class="photo-status">Không tải được ảnh. (' + escapeHtml(err.message) + ')</div>';
+    }
   }
 </script>
 
