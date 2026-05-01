@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Palette · Ink</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 22px; background: var(--paper-cream); display:flex; flex-direction:column; gap: 18px; }
+  .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .sw { aspect-ratio: 2.4 / 1; border-radius: var(--radius-soft); padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
+  .sw .name { font-family: var(--font-serif); font-size: 13px; color: #f4ead7; }
+  .sw .hex { font-family: var(--font-serif); font-size: 11px; color: rgba(244,234,215,0.7); font-style: italic; }
+  .head { font-family: var(--font-hand); font-size: 24px; color: var(--ink); margin: 0; }
+  .sub { font-family: var(--font-serif); font-style: italic; font-size: 12px; color: var(--ink-soft); margin: 0; }
+  .demo { padding: 14px 18px; background: var(--paper-cream-warm); border-radius: var(--radius-soft); border: 1px solid rgba(58,40,24,0.12); }
+  .demo p { margin: 0 0 4px; }
+</style>
+</head>
+<body>
+<div>
+<h2 class="head">Ink — text. Never pure black. Never on pure white.</h2>
+<p class="sub">All four sit on cream, never on #fff.</p>
+</div>
+<div class="row">
+  <div class="sw" style="background:#3a2818"><div class="name">ink</div><div class="hex">#3a2818</div></div>
+  <div class="sw" style="background:#5a4530"><div class="name">ink-soft</div><div class="hex">#5a4530</div></div>
+  <div class="sw" style="background:#8a6f50"><div class="name">ink-faded</div><div class="hex">#8a6f50</div></div>
+  <div class="sw" style="background:#b39c7a"><div class="name">ink-ghost</div><div class="hex">#b39c7a</div></div>
+</div>
+<div class="demo">
+  <p style="color:#3a2818;font-family:var(--font-serif);font-size:18px">Mẹ ơi, về nhà thôi.</p>
+  <p style="color:#5a4530;font-family:var(--font-serif);font-size:15px">Một ngôi nhà đầy kỷ niệm — soft secondary text.</p>
+  <p style="color:#8a6f50;font-family:var(--font-serif);font-size:13px;font-style:italic">Tháng Tư, năm 2025 — caption / date</p>
+  <p style="color:#b39c7a;font-family:var(--font-serif);font-size:13px">Chưa có gì ở đây… (placeholder)</p>
+</div>
+</body>
+</html>

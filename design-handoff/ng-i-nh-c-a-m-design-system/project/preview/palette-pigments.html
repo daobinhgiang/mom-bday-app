@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Palette · Pigments</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 18px 22px; background: var(--paper-cream); }
+  .row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .sw { aspect-ratio: 1.1 / 1; border-radius: var(--radius-soft); border: 1px solid rgba(58,40,24,0.18); padding: 10px; display: flex; flex-direction: column; justify-content: flex-end; box-shadow: var(--shadow-paper); }
+  .sw .name { font-family: var(--font-serif); font-size: 12px; }
+  .sw .hex { font-family: var(--font-serif); font-size: 10px; font-style: italic; }
+  .sw.dark .name, .sw.dark .hex { color: #f4ead7; }
+  .sw .name, .sw .hex { color: var(--ink); }
+  .sw.dark .hex { color: rgba(244,234,215,0.7); }
+  .head { font-family: var(--font-hand); font-size: 24px; color: var(--ink); margin: 0 0 6px; }
+  .sub { font-family: var(--font-serif); font-style: italic; font-size: 12px; color: var(--ink-soft); margin: 0 0 12px; }
+</style>
+</head>
+<body>
+<h2 class="head">Pigments — used like real paint, sparingly</h2>
+<p class="sub">Never a full background. Never a default state. The "spice" of the palette.</p>
+<div class="row">
+  <div class="sw dark" style="background:#e8b34a"><div class="name">lantern-yellow</div><div class="hex">#e8b34a</div></div>
+  <div class="sw" style="background:#f4d27a"><div class="name">lantern-glow</div><div class="hex">#f4d27a</div></div>
+  <div class="sw dark" style="background:#9c2a2a"><div class="name">lacquer-red</div><div class="hex">#9c2a2a</div></div>
+  <div class="sw dark" style="background:#6e1818"><div class="name">lacquer-red-deep</div><div class="hex">#6e1818</div></div>
+  <div class="sw dark" style="background:#5a7a52"><div class="name">jade-green</div><div class="hex">#5a7a52</div></div>
+  <div class="sw dark" style="background:#3a5236"><div class="name">jade-green-deep</div><div class="hex">#3a5236</div></div>
+  <div class="sw dark" style="background:#3a4f6e"><div class="name">indigo-blue</div><div class="hex">#3a4f6e</div></div>
+  <div class="sw dark" style="background:#6b7e9a"><div class="name">indigo-blue-soft</div><div class="hex">#6b7e9a</div></div>
+  <div class="sw" style="background:#e89db0"><div class="name">peach-blossom</div><div class="hex">#e89db0</div></div>
+  <div class="sw dark" style="background:#a14d2e"><div class="name">tile-roof</div><div class="hex">#a14d2e</div></div>
+  <div class="sw dark" style="background:#6b3018"><div class="name">tile-roof-shadow</div><div class="hex">#6b3018</div></div>
+  <div class="sw dark" style="background:#3f5560"><div class="name">shutter-blue-deep</div><div class="hex">#3f5560</div></div>
+</div>
+</body>
+</html>

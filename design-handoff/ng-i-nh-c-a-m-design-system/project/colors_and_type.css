@@ -1,0 +1,286 @@
+/* =========================================================================
+   Ngôi Nhà Của Mẹ — Design Tokens
+   All values are warm, painted, slightly imperfect. Aged photo, not screen-bright.
+   ========================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Patrick+Hand&family=Caveat+Brush&family=Kalam:wght@400;700&subset=vietnamese&display=swap');
+
+:root {
+  /* ---------------------------------------------------------------------
+     SURFACES — the 90% of the canvas. Walls, paper, wood.
+     Names map to physical things, not abstract roles.
+     --------------------------------------------------------------------- */
+  --paper-cream:        #f4ead7;   /* base canvas — old paper / lime-washed wall */
+  --paper-cream-warm:   #ecdcb9;   /* slightly deeper cream, for layered surfaces */
+  --paper-grain:        #e3d2ad;   /* recessed paper / subtle inset */
+  --wall-ochre:         #c9985a;   /* Saigon ochre wall */
+  --wall-ochre-deep:    #a87538;   /* shaded ochre, late-afternoon side of wall */
+  --wall-rose:          #d8a98a;   /* old rose-pink wall, sometimes seen */
+
+  --wood-teak:          #8b5a2b;   /* faded teak — desks, beams */
+  --wood-teak-dark:     #5e3a1a;   /* dark teak — book spines, frames */
+  --wood-teak-light:    #b58860;   /* sun-bleached teak — woven mat, floors */
+  --wood-rosewood:      #4a2418;   /* rosewood — formal furniture, bàn thờ */
+
+  --tile-roof:          #a14d2e;   /* terracotta tile (mái ngói) */
+  --tile-roof-shadow:   #6b3018;   /* under-eave tile shadow */
+
+  --shutter-blue:       #5d7a86;   /* old wooden shutter blue, faded */
+  --shutter-blue-deep:  #3f5560;
+
+  /* ---------------------------------------------------------------------
+     PIGMENTS — accents. Used like real pigments: sparingly.
+     Never a full background. Never a default state.
+     --------------------------------------------------------------------- */
+  --lantern-yellow:     #e8b34a;   /* warm lantern light */
+  --lantern-glow:       #f4d27a;   /* the halo around it */
+  --lacquer-red:        #9c2a2a;   /* sơn mài red, Tết banner */
+  --lacquer-red-deep:   #6e1818;
+  --jade-green:         #5a7a52;   /* jade — bonsai leaf, jade earring */
+  --jade-green-deep:    #3a5236;
+  --indigo-blue:        #3a4f6e;   /* deep painter's indigo */
+  --indigo-blue-soft:   #6b7e9a;
+  --peach-blossom:      #e89db0;   /* Tết peach blossom (hoa đào) */
+
+  /* ---------------------------------------------------------------------
+     INK — text. Never pure black. Never on pure white.
+     --------------------------------------------------------------------- */
+  --ink:                #3a2818;   /* primary text — dark brown-black */
+  --ink-soft:           #5a4530;   /* secondary text */
+  --ink-faded:          #8a6f50;   /* tertiary, captions, dates */
+  --ink-ghost:          #b39c7a;   /* almost-erased — placeholder */
+
+  /* ---------------------------------------------------------------------
+     TIME-OF-DAY LIGHT — global filter overlays.
+     Apply as a multiply/overlay layer over the whole canvas.
+     --------------------------------------------------------------------- */
+  --light-sunrise:      #f5c97a;   /* warm gold, low angle */
+  --light-noon:         #fbf2dc;   /* bright cream */
+  --light-sunset:       #e89c5a;   /* amber */
+  --light-night:        #2b3a52;   /* deep blue with lantern halos */
+  --light-rain:         #8aa3b5;   /* cool grey-blue, slightly desaturated */
+
+  /* Default (controlled at runtime by JS based on local time) */
+  --light-current: var(--light-noon);
+
+  /* ---------------------------------------------------------------------
+     SEMANTIC ROLES — for app code. Map to surfaces & ink above.
+     --------------------------------------------------------------------- */
+  --bg:                 var(--paper-cream);
+  --bg-elevated:        var(--paper-cream-warm);
+  --bg-recessed:        var(--paper-grain);
+  --bg-room:            var(--wall-ochre);
+
+  --fg:                 var(--ink);
+  --fg-soft:            var(--ink-soft);
+  --fg-faded:           var(--ink-faded);
+  --fg-ghost:           var(--ink-ghost);
+
+  --accent:             var(--lantern-yellow);   /* warmest accent — the glow */
+  --accent-warm:        var(--lacquer-red);      /* used very sparingly */
+  --accent-cool:        var(--indigo-blue);
+  --accent-leaf:        var(--jade-green);
+
+  /* ---------------------------------------------------------------------
+     TYPOGRAPHY
+     Two voices: handwritten (Caveat) for personal content,
+     soft serif (Lora) for body. No sans-serif tech fonts.
+     --------------------------------------------------------------------- */
+  --font-hand:          'Caveat Brush', 'Kalam', 'Patrick Hand', 'Segoe Script', cursive;
+  --font-serif:         'Lora', 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+  --font-display:       var(--font-serif);   /* same family, larger sizes */
+
+  /* Scale — generous, not dense */
+  --text-xs:            12px;   /* dates, tiny captions only */
+  --text-sm:            14px;
+  --text-base:          17px;   /* body */
+  --text-md:            19px;
+  --text-lg:            22px;
+  --text-xl:            28px;
+  --text-2xl:           36px;
+  --text-3xl:           48px;   /* room titles */
+  --text-4xl:           64px;   /* hero / homecoming */
+
+  /* Hand sizes — handwriting reads larger to feel natural */
+  --hand-sm:            18px;
+  --hand-base:          22px;
+  --hand-lg:            28px;
+  --hand-xl:            38px;
+
+  /* Line heights — generous, room to breathe */
+  --leading-tight:      1.2;
+  --leading-snug:       1.4;
+  --leading-body:       1.6;
+  --leading-loose:      1.8;
+
+  /* Letter spacing — almost none. Painted type doesn't track. */
+  --tracking-tight:     -0.01em;
+  --tracking-normal:    0;
+  --tracking-wide:      0.04em;   /* tiny labels only */
+
+  /* ---------------------------------------------------------------------
+     SPACING — 4px base, but used loosely. Margins are breath, not rhythm.
+     --------------------------------------------------------------------- */
+  --space-1:            4px;
+  --space-2:            8px;
+  --space-3:            12px;
+  --space-4:            16px;
+  --space-5:            24px;
+  --space-6:            32px;
+  --space-7:            48px;
+  --space-8:            64px;
+  --space-9:            96px;
+  --space-10:           144px;
+
+  /* ---------------------------------------------------------------------
+     CORNERS — organic, never uniform pill-corners.
+     Default is barely-there paper edge.
+     --------------------------------------------------------------------- */
+  --radius-paper:       2px;     /* sheet of paper */
+  --radius-soft:        4px;     /* book spine, frame */
+  --radius-tile:        6px;     /* tile, ceramic */
+  --radius-full:        999px;   /* only for true circles — lantern, record */
+
+  /* ---------------------------------------------------------------------
+     SHADOWS — cast, never glowed. All warm-brown, never blue.
+     --------------------------------------------------------------------- */
+  --shadow-paper:       0 1px 2px rgba(58, 40, 24, 0.12);
+  --shadow-object:      0 3px 6px rgba(58, 40, 24, 0.18),
+                        0 1px 2px rgba(58, 40, 24, 0.12);
+  --shadow-room:        0 12px 32px rgba(58, 40, 24, 0.22),
+                        0 4px 8px rgba(58, 40, 24, 0.14);
+  --shadow-inset:       inset 0 2px 4px rgba(58, 40, 24, 0.18);
+  --shadow-lantern:     0 0 24px rgba(232, 179, 74, 0.45),
+                        0 0 8px rgba(244, 210, 122, 0.6);
+
+  /* ---------------------------------------------------------------------
+     EASINGS — physical, with settle. Never linear.
+     --------------------------------------------------------------------- */
+  --ease-settle:        cubic-bezier(0.22, 0.9, 0.32, 1);    /* default */
+  --ease-door:          cubic-bezier(0.34, 1.2, 0.64, 1);    /* hinge w/ overshoot */
+  --ease-paper:         cubic-bezier(0.4, 0.0, 0.2, 1);      /* page turn */
+  --ease-weight:        cubic-bezier(0.5, 0.0, 0.4, 1);      /* heavy object */
+
+  --dur-quick:          280ms;
+  --dur-base:           480ms;
+  --dur-slow:           720ms;
+  --dur-room:           1100ms;   /* room camera dolly */
+
+  /* ---------------------------------------------------------------------
+     TEXTURES — referenced by url(); files live in assets/textures/
+     --------------------------------------------------------------------- */
+  --texture-paper:      url('assets/textures/paper-grain.svg');
+  --texture-watercolor: url('assets/textures/watercolor-bleed.svg');
+}
+
+/* =========================================================================
+   BASE TYPOGRAPHY — semantic element rules.
+   ========================================================================= */
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-serif);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, .h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  line-height: var(--leading-tight);
+  font-weight: 500;
+  color: var(--fg);
+  letter-spacing: var(--tracking-tight);
+}
+
+h2, .h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  line-height: var(--leading-snug);
+  font-weight: 500;
+  color: var(--fg);
+}
+
+h3, .h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+  font-weight: 500;
+  color: var(--fg);
+}
+
+p, .body {
+  font-family: var(--font-serif);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--fg);
+  text-wrap: pretty;
+}
+
+.body-soft   { color: var(--fg-soft); }
+.body-faded  { color: var(--fg-faded); font-size: var(--text-sm); }
+.caption     { font-family: var(--font-serif); font-size: var(--text-xs); color: var(--fg-faded); font-style: italic; }
+
+/* Handwriting voice — for personal content only */
+.hand        { font-family: var(--font-hand); font-size: var(--hand-base); line-height: var(--leading-snug); color: var(--ink); }
+.hand-lg     { font-family: var(--font-hand); font-size: var(--hand-lg); line-height: var(--leading-snug); color: var(--ink); }
+.hand-xl     { font-family: var(--font-hand); font-size: var(--hand-xl); line-height: var(--leading-tight); color: var(--ink); }
+
+/* The closing-screen farewell */
+.farewell {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--text-xl);
+  color: var(--lantern-glow);
+  letter-spacing: var(--tracking-wide);
+}
+
+/* The only ambient "label" voice. Tiny, all caps allowed only here. */
+.label-ambient {
+  font-family: var(--font-serif);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  color: var(--fg-faded);
+  text-transform: none;
+}
+
+/* =========================================================================
+   PAPER SURFACE UTILITY — apply to anything that should feel like paper.
+   ========================================================================= */
+.surface-paper {
+  background-color: var(--paper-cream);
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(168, 117, 56, 0.06), transparent 60%),
+    radial-gradient(ellipse at 70% 80%, rgba(58, 40, 24, 0.05), transparent 60%);
+  box-shadow: var(--shadow-paper);
+  border-radius: var(--radius-paper);
+}
+
+.surface-room {
+  background-color: var(--wall-ochre);
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(244, 210, 122, 0.18), transparent 70%),
+    radial-gradient(ellipse at 50% 100%, rgba(58, 40, 24, 0.18), transparent 70%);
+}
+
+/* Press state — universally available */
+.pressable { transition: transform var(--dur-quick) var(--ease-settle); }
+.pressable:active { transform: translateY(1px) scale(0.99); }
+
+/* Hover-warm — universally available */
+.hover-warm { transition: transform var(--dur-base) var(--ease-settle), filter var(--dur-base) var(--ease-settle); }
+.hover-warm:hover { transform: scale(1.015) rotate(-0.4deg); filter: saturate(1.08) brightness(1.03); }
+
+/* Lantern glow — for new-content indicators */
+.lantern-glow {
+  box-shadow: var(--shadow-lantern);
+  animation: flicker 5.4s var(--ease-settle) infinite;
+}
+@keyframes flicker {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  43%      { opacity: 0.92; filter: brightness(1.08); }
+  47%      { opacity: 0.98; filter: brightness(0.96); }
+  72%      { opacity: 0.96; filter: brightness(1.05); }
+}

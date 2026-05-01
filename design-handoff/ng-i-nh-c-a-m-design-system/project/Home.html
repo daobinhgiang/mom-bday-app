@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ngôi Nhà Của Mẹ</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; background: #2a1810; }
+  body { font-family: var(--font-serif); color: var(--ink); }
+  * { box-sizing: border-box; }
+  img { image-rendering: pixelated; image-rendering: crisp-edges; }
+
+  /* ─────────────────────────────────────────────────────────────────
+     STAGE — the whole world. Time-of-day lives on the data attribute.
+     ───────────────────────────────────────────────────────────────── */
+  /* deep-brown vignette frame, like the reference room edge */
+  .stage {
+    position: relative;
+    width: 100vw;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 50% 50%, #f0d4a8 0%, #d8b888 55%, #6e3a1c 92%, #3a1c10 100%);
+    overflow: hidden;
+  }
+
+  /* time-of-day light wash */
+  .light-overlay {
+    position: fixed; inset: 0; pointer-events: none; z-index: 50;
+    mix-blend-mode: multiply;
+    transition: background var(--dur-room) var(--ease-settle), opacity var(--dur-room) var(--ease-settle);
+    background: var(--light-sunset); opacity: 0.42;
+  }
+  .stage[data-tod="sunrise"] .light-overlay { background: #f5c97a; opacity: 0.30; }
+  .stage[data-tod="noon"]    .light-overlay { background: #fbf2dc; opacity: 0.18; }
+  .stage[data-tod="sunset"]  .light-overlay { background: #e89c5a; opacity: 0.42; }
+  .stage[data-tod="night"]   .light-overlay { background: #2b3a52; opacity: 0.58; }
+
+  /* always-on paper grain */
+  .grain-overlay {
+    position: fixed; inset: 0; pointer-events: none; z-index: 51;
+    background-image: url('assets/textures/paper-grain.svg');
+    background-size: 400px 400px;
+    opacity: 0.4;
+    mix-blend-mode: multiply;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────
+     DOOR SCREEN — first arrival. Knock to come in.
+     ───────────────────────────────────────────────────────────────── */
+  .door-screen {
+    position: fixed; inset: 0; z-index: 100;
+    background:
+      radial-gradient(ellipse at 50% 40%, #6b3e1a 0%, #3a200f 55%, #1c0e08 100%);
+    display: grid;
+    place-items: center;
+    transition: opacity 900ms var(--ease-settle);
+  }
+  .door-screen.gone { opacity: 0; pointer-events: none; }
+
+  /* a soft halo of warm light bleeding around the door, like a porch lamp */
+  .door-screen::before {
+    content: '';
+    position: absolute;
+    width: 720px; height: 720px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(244,210,122,0.22) 0%, rgba(232,179,74,0.06) 40%, transparent 70%);
+    filter: blur(8px);
+    pointer-events: none;
+  }
+
+  /* faint painted lantern lighting from above */
+  .porch-lantern {
+    position: absolute;
+    top: 8vh; left: 50%; transform: translateX(-50%);
+    width: 56px; height: 84px;
+    filter: drop-shadow(0 0 18px var(--lantern-glow))
+            drop-shadow(0 0 40px rgba(232,179,74,0.6));
+    animation: flicker 5.4s ease-in-out infinite;
+    z-index: 2;
+  }
+
+  /* a tiny twig sprig + nameplate frame */
+  .door-wrap {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center; gap: 28px;
+    z-index: 2;
+  }
+
+  .door {
+    width: 280px; height: 480px;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.18) 100%),
+      linear-gradient(135deg, #6b4220 0%, #3a2010 100%);
+    border: 8px solid #2a1810;
+    border-bottom: 0;
+    border-radius: 6px 6px 0 0;
+    position: relative;
+    cursor: pointer;
+    box-shadow:
+      0 30px 70px rgba(0,0,0,0.7),
+      inset 0 0 50px rgba(0,0,0,0.35),
+      inset 4px 0 8px rgba(255,255,255,0.04);
+    transition: transform 1100ms var(--ease-door);
+    transform-origin: left center;
+    transform-style: preserve-3d;
+  }
+  .door::before, .door::after {
+    /* two recessed panels */
+    content: '';
+    position: absolute;
+    left: 22px; right: 22px;
+    border: 1px solid rgba(244,234,215,0.06);
+    box-shadow: inset 0 0 22px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(0,0,0,0.4);
+    background: linear-gradient(160deg, rgba(0,0,0,0.18), rgba(0,0,0,0.05));
+  }
+  .door::before { top: 38px;  height: 38%; }
+  .door::after  { bottom: 38px; height: 38%; }
+
+  /* nameplate — a small brass plate that says Mẹ */
+  .nameplate {
+    position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(180deg, #d8a55f, #a87538);
+    color: #2a1810;
+    font-family: var(--font-hand);
+    font-size: 26px;
+    line-height: 1;
+    padding: 2px 22px 4px;
+    border-radius: 2px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.4),
+      inset 0 -1px 0 rgba(0,0,0,0.3),
+      0 1px 2px rgba(0,0,0,0.4);
+    z-index: 3;
+  }
+
+  /* knocker */
+  .knocker {
+    position: absolute;
+    left: 50%; top: 38%;
+    transform: translate(-50%, -50%);
+    width: 44px; height: 44px;
+    z-index: 3;
+    cursor: pointer;
+  }
+  .knocker .ring {
+    position: absolute; inset: 0;
+    border: 4px solid #d8a55f;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 35%, #f4d27a, #a87538 60%, #6b3e1a);
+    box-shadow:
+      inset 0 -2px 4px rgba(0,0,0,0.4),
+      0 2px 4px rgba(0,0,0,0.5);
+    transition: transform 480ms var(--ease-door);
+    transform-origin: 50% 0%;
+  }
+  .knocker .plate {
+    position: absolute; left: 50%; top: -8px; transform: translateX(-50%);
+    width: 22px; height: 12px;
+    background: linear-gradient(180deg, #d8a55f, #8a5a30);
+    border-radius: 2px 2px 0 0;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.4);
+  }
+  .knocker:hover .ring { transform: rotate(-8deg); }
+  .knocker.knock .ring { animation: knock 600ms var(--ease-door); }
+  @keyframes knock {
+    0%   { transform: rotate(0deg); }
+    30%  { transform: rotate(-22deg); }
+    55%  { transform: rotate(8deg); }
+    80%  { transform: rotate(-6deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  /* doorknob */
+  .knob {
+    position: absolute;
+    right: 22px; top: 56%;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #f4d27a, #a87538 60%, #5e3a1a);
+    box-shadow: 0 0 10px rgba(244,210,122,0.6), 0 0 2px #fff, inset 0 -1px 2px rgba(0,0,0,0.4);
+  }
+
+  /* doormat */
+  .doormat {
+    position: absolute;
+    bottom: -22px;
+    left: 50%; transform: translateX(-50%);
+    width: 320px; height: 24px;
+    background:
+      repeating-linear-gradient(90deg, #6b4a28 0 4px, #4a2c14 4px 8px),
+      #5a3820;
+    border: 2px solid #2a1810;
+    border-bottom: none;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+  }
+  .doormat::before {
+    content: 'mến';
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    font-family: var(--font-hand);
+    font-size: 16px;
+    color: rgba(244,210,122,0.55);
+    letter-spacing: 0.2em;
+  }
+
+  .door-label {
+    font-family: var(--font-hand);
+    font-size: 38px;
+    color: var(--lantern-glow);
+    text-align: center;
+    line-height: 1;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+  .door-sub {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 15px;
+    color: rgba(244,234,215,0.55);
+    text-align: center;
+    margin-top: -16px;
+  }
+
+  /* a moth fluttering near the porch lamp */
+  .moth {
+    position: absolute;
+    width: 10px; height: 10px;
+    background: rgba(244,234,215,0.5);
+    border-radius: 50%;
+    box-shadow:
+      -6px 0 0 -2px rgba(244,234,215,0.4),
+       6px 0 0 -2px rgba(244,234,215,0.4);
+    animation: moth-path 11s ease-in-out infinite;
+    z-index: 2;
+    pointer-events: none;
+    filter: blur(0.5px);
+  }
+  @keyframes moth-path {
+    0%   { transform: translate(-200px, -180px) rotate(0); }
+    20%  { transform: translate(-80px, -260px) rotate(20deg); }
+    40%  { transform: translate(120px, -200px) rotate(-15deg); }
+    60%  { transform: translate(180px, -120px) rotate(10deg); }
+    80%  { transform: translate(-40px, -100px) rotate(-8deg); }
+    100% { transform: translate(-200px, -180px) rotate(0); }
+  }
+
+  /* ─────────────────────────────────────────────────────────────────
+     HUB — the painted house. After the door opens, this is home.
+     ───────────────────────────────────────────────────────────────── */
+  .hub {
+    position: relative;
+    min-height: 100vh;
+    padding: 28px 24px 60px;
+    opacity: 0;
+    transition: opacity 900ms var(--ease-settle) 200ms;
+  }
+  .hub.shown { opacity: 1; }
+
+  .hub-header {
+    text-align: center;
+    margin: 6px 0 22px;
+    position: relative; z-index: 2;
+  }
+  .hub-header h1 {
+    font-family: var(--font-hand);
+    font-size: 64px;
+    line-height: 1;
+    color: var(--ink);
+    margin: 0;
+    letter-spacing: var(--tracking-tight);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+  }
+  .hub-header .greeting {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+  .hub-header .greeting .who {
+    color: var(--ink);
+    font-style: normal;
+    font-family: var(--font-hand);
+    font-size: 22px;
+    letter-spacing: 0.01em;
+  }
+
+  /* a tiny painted sun/moon glyph beside the greeting */
+  .tod-glyph {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    vertical-align: -3px;
+    margin: 0 6px 0 0;
+    background: var(--lantern-glow);
+    box-shadow: 0 0 10px var(--lantern-glow);
+  }
+  .stage[data-tod="night"] .tod-glyph {
+    background: #ecdcb9;
+    box-shadow: 0 0 12px rgba(244,234,215,0.6), inset -4px 0 0 rgba(58,40,24,0.6);
+  }
+  .stage[data-tod="noon"] .tod-glyph { background: #fbf2dc; box-shadow: 0 0 18px #fbf2dc; }
+  .stage[data-tod="sunrise"] .tod-glyph { background: #f5c97a; box-shadow: 0 0 14px #f5c97a; }
+
+  /* the house illustration with positioned room hot zones */
+  .house {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+    aspect-ratio: 120 / 80;
+    /* warm lamp halo behind the house */
+    background:
+      radial-gradient(ellipse at 50% 60%, rgba(244,210,122,0.22), transparent 65%),
+      radial-gradient(ellipse at 50% 100%, rgba(58,28,16,0.22), transparent 70%);
+    padding: 12px;
+  }
+  .house-bg {
+    position: absolute; inset: 12px;
+    width: calc(100% - 24px); height: calc(100% - 24px);
+    pointer-events: none;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    filter: drop-shadow(0 18px 32px rgba(40,20,12,0.45));
+  }
+
+  /* room hot-zones — invisible until hover; warm glow on hover */
+  .room-hot {
+    position: absolute;
+    cursor: pointer;
+    border-radius: var(--radius-soft);
+    transition:
+      background var(--dur-base) var(--ease-settle),
+      transform var(--dur-base) var(--ease-settle);
+    background: rgba(244,210,122,0);
+  }
+  .room-hot:hover {
+    background: rgba(244,210,122,0.16);
+    transform: scale(1.012);
+  }
+  .room-hot:hover .room-tag {
+    opacity: 1;
+    transform: translate(-50%, 0) rotate(-1.5deg);
+  }
+  .room-hot:active { transform: translateY(1px) scale(0.995); }
+
+  /* hand-written room labels — appear on hover, like little paper signs */
+  .room-tag {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translate(-50%, 6px) rotate(-1.5deg);
+    font-family: var(--font-hand);
+    font-size: 22px;
+    color: var(--ink);
+    background: var(--paper-cream);
+    padding: 2px 14px 4px;
+    border-radius: 2px;
+    box-shadow: var(--shadow-paper);
+    opacity: 0;
+    transition: opacity var(--dur-base) var(--ease-settle), transform var(--dur-base) var(--ease-settle);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .room-tag::before {
+    /* a tiny painted pin */
+    content: '';
+    position: absolute; top: -4px; left: 50%;
+    width: 6px; height: 6px;
+    background: var(--lacquer-red);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+
+  /* lantern glow on rooms with new content */
+  .room-lantern {
+    position: absolute;
+    top: -10px; right: 14px;
+    width: 22px; height: 32px;
+    pointer-events: none;
+  }
+  .room-lantern img {
+    width: 100%; height: 100%;
+    filter:
+      drop-shadow(0 0 10px #f4d27a)
+      drop-shadow(0 0 22px rgba(232,179,74,0.55));
+    animation: flicker 5.4s ease-in-out infinite;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────
+     LOGBOOK — the only list-based UI. By the front door.
+     A little "what was left for Mẹ today" note.
+     ───────────────────────────────────────────────────────────────── */
+  .logbook {
+    max-width: 1100px;
+    margin: 32px auto 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 760px) {
+    .logbook { grid-template-columns: 1fr; }
+    .hub-header h1 { font-size: 44px; }
+  }
+  .logbook-card {
+    position: relative;
+    background: var(--paper-cream);
+    background-image:
+      radial-gradient(ellipse at 30% 20%, rgba(168,117,56,0.06), transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(58,40,24,0.05), transparent 60%);
+    box-shadow: var(--shadow-paper), 0 6px 16px rgba(58,40,24,0.12);
+    padding: 18px 20px 16px;
+    border-radius: 2px;
+    transition: transform var(--dur-base) var(--ease-settle);
+    cursor: default;
+  }
+  .logbook-card:nth-child(1) { transform: rotate(-1deg); }
+  .logbook-card:nth-child(2) { transform: rotate(0.6deg); }
+  .logbook-card:nth-child(3) { transform: rotate(-0.4deg); }
+  .logbook-card:hover { transform: rotate(0deg) translateY(-2px); }
+
+  .logbook-card::before {
+    /* paper pin */
+    content: '';
+    position: absolute;
+    top: -6px; left: 22px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #d8a55f, #8a5a30 60%, #5e3a1a);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4), inset 0 -1px 1px rgba(0,0,0,0.4);
+  }
+  .logbook-card .from {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 12px;
+    color: var(--ink-faded);
+    margin-bottom: 4px;
+  }
+  .logbook-card .what {
+    font-family: var(--font-hand);
+    font-size: 22px;
+    line-height: 1.25;
+    color: var(--ink);
+  }
+  .logbook-card .where {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+  }
+  .logbook-card .where::before {
+    content: '— '; color: var(--ink-faded);
+  }
+
+  /* ─────────────────────────────────────────────────────────────────
+     TOOLBAR — minimal corner. Mute is default-on, always visible.
+     ───────────────────────────────────────────────────────────────── */
+  .toolbar {
+    position: fixed; top: 18px; right: 18px; z-index: 60;
+    display: flex; gap: 10px; align-items: center;
+    opacity: 0;
+    transition: opacity 900ms var(--ease-settle) 600ms;
+  }
+  .toolbar.shown { opacity: 1; }
+  .toolbar button {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--paper-cream-warm);
+    border: 1px solid rgba(58,40,24,0.2);
+    box-shadow: var(--shadow-paper);
+    font-family: var(--font-serif);
+    font-size: 16px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: transform var(--dur-quick) var(--ease-settle);
+  }
+  .toolbar button:hover { transform: translateY(-1px) rotate(-3deg); }
+  .toolbar button:active { transform: translateY(1px) scale(0.97); }
+
+  /* ambient pill, bottom-left */
+  .ambient-pill {
+    position: fixed; bottom: 18px; left: 18px; z-index: 60;
+    background: var(--paper-cream-warm);
+    border: 1px solid rgba(58,40,24,0.18);
+    border-radius: 999px;
+    padding: 7px 16px;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-soft);
+    box-shadow: var(--shadow-paper);
+    display: flex; gap: 9px; align-items: center;
+    opacity: 0;
+    transition: opacity 900ms var(--ease-settle) 800ms;
+  }
+  .ambient-pill.shown { opacity: 1; }
+  .ambient-pill .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--lantern-yellow);
+    box-shadow: 0 0 8px var(--lantern-glow);
+  }
+
+  /* a soft farewell hint button — top-left, like closing a window for the night */
+  .close-hint {
+    position: fixed; top: 18px; left: 18px; z-index: 60;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-soft);
+    background: var(--paper-cream-warm);
+    padding: 6px 14px;
+    border-radius: 2px;
+    border: 1px solid rgba(58,40,24,0.18);
+    box-shadow: var(--shadow-paper);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 900ms var(--ease-settle) 800ms, transform var(--dur-quick) var(--ease-settle);
+  }
+  .close-hint.shown { opacity: 1; }
+  .close-hint:hover { transform: translateY(-1px) rotate(-1deg); }
+
+  /* ─────────────────────────────────────────────────────────────────
+     FAREWELL — quiet dim out at end of session.
+     ───────────────────────────────────────────────────────────────── */
+  .farewell {
+    position: fixed; inset: 0; z-index: 80;
+    background: radial-gradient(ellipse at 50% 65%, rgba(232,179,74,0.18), rgba(43,58,82,0.96) 60%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 32px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 1200ms var(--ease-settle);
+  }
+  .farewell.show { opacity: 1; pointer-events: auto; }
+  .farewell .lan {
+    width: 64px; height: 96px;
+    filter:
+      drop-shadow(0 0 26px var(--lantern-glow))
+      drop-shadow(0 0 60px rgba(232,179,74,0.6));
+    animation: flicker 5.4s ease-in-out infinite;
+  }
+  .farewell .text {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 32px;
+    color: var(--lantern-glow);
+    letter-spacing: 0.04em;
+  }
+  .farewell .sub {
+    font-family: var(--font-hand);
+    font-size: 22px;
+    color: rgba(244,234,215,0.6);
+  }
+
+  /* door opening — paper-physical hinge */
+  .door.opening { transform: perspective(1100px) rotateY(-78deg); }
+
+  @media (max-width: 760px) {
+    .door { width: 220px; height: 380px; }
+    .doormat { width: 240px; }
+    .door-label { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage" data-tod="sunset">
+
+  <!-- ───────── DOOR ───────── -->
+  <div class="door-screen" id="doorScreen">
+    <img class="porch-lantern" src="assets/lantern.svg" alt="">
+    <div class="moth"></div>
+
+    <div class="door-wrap">
+      <div class="door" id="door">
+        <div class="nameplate">Mẹ</div>
+        <div class="knocker" id="knocker">
+          <div class="plate"></div>
+          <div class="ring"></div>
+        </div>
+        <div class="knob"></div>
+        <div class="doormat"></div>
+      </div>
+      <div class="door-label">gõ cửa, vào nhà thôi Mẹ</div>
+      <div class="door-sub">— chạm vào cánh cửa —</div>
+    </div>
+  </div>
+
+  <!-- ───────── HUB ───────── -->
+  <div class="hub" id="hub" aria-hidden="true">
+    <div class="hub-header">
+      <h1>Ngôi Nhà Của Mẹ</h1>
+      <div class="greeting">
+        <span class="tod-glyph"></span>
+        <span id="greetingText">— buổi chiều, mặt trời đang xuống. Mẹ về rồi ạ —</span>
+      </div>
+    </div>
+
+    <div class="house">
+      <img src="assets/house-cross-section.svg" class="house-bg" alt="ngôi nhà của Mẹ — mặt cắt">
+
+      <!-- Library: top-left -->
+      <a class="room-hot" href="#" data-room="library"
+         style="left:9%; top:30%; width:20%; height:23%">
+        <div class="room-tag">Thư Viện</div>
+        <div class="room-lantern"><img src="assets/lantern.svg" alt=""></div>
+      </a>
+
+      <!-- Music: top-mid-left -->
+      <a class="room-hot" href="#" data-room="music"
+         style="left:30%; top:30%; width:20%; height:23%">
+        <div class="room-tag">Phòng Nhạc</div>
+      </a>
+
+      <!-- Map: top-mid-right -->
+      <a class="room-hot" href="#" data-room="map"
+         style="left:51%; top:30%; width:20%; height:23%">
+        <div class="room-tag">Phòng Bản Đồ</div>
+      </a>
+
+      <!-- Family: top-right (has new content lantern) -->
+      <a class="room-hot" href="#" data-room="family"
+         style="left:72%; top:30%; width:18%; height:23%">
+        <div class="room-tag">Phòng Gia Đình</div>
+        <div class="room-lantern"><img src="assets/lantern.svg" alt=""></div>
+      </a>
+
+      <!-- Bedroom: bottom-left -->
+      <a class="room-hot" href="#" data-room="bedroom"
+         style="left:9%; top:60%; width:34%; height:24%">
+        <div class="room-tag">Phòng Ngủ của Mẹ</div>
+      </a>
+
+      <!-- Garden: bottom-right -->
+      <a class="room-hot" href="#" data-room="garden"
+         style="left:65%; top:60%; width:25%; height:24%">
+        <div class="room-tag">Vườn</div>
+      </a>
+    </div>
+
+    <!-- LOGBOOK — three folded notes by the door -->
+    <div class="logbook" aria-label="Hôm nay ai đến thăm">
+      <article class="logbook-card">
+        <div class="from">— hôm nay, 6 giờ chiều</div>
+        <div class="what">Cháu Minh để lại một bức vẽ trong vườn cho Bà.</div>
+        <div class="where">Vườn</div>
+      </article>
+      <article class="logbook-card">
+        <div class="from">— sáng nay</div>
+        <div class="what">Con Trai vừa thêm một trang mới trong cuốn sách của con.</div>
+        <div class="where">Thư Viện</div>
+      </article>
+      <article class="logbook-card">
+        <div class="from">— tối qua</div>
+        <div class="what">Bố để bài hát "Diễm Xưa" lên kệ — bài Mẹ hay nghe những chiều mưa.</div>
+        <div class="where">Phòng Nhạc</div>
+      </article>
+    </div>
+  </div>
+
+  <!-- ───────── CHROME ───────── -->
+  <div class="close-hint" id="closeHint" onclick="farewell()">đóng cửa, hẹn ngày mai</div>
+
+  <div class="toolbar" id="toolbar">
+    <button id="muteBtn" title="bật âm" aria-label="bật âm" onclick="toggleMute()">♪</button>
+    <button id="todBtn"  title="đổi giờ trong ngày" aria-label="đổi giờ trong ngày" onclick="cycleTOD()">☼</button>
+  </div>
+
+  <div class="ambient-pill" id="ambientPill">
+    <div class="dot"></div>
+    <span id="ambientLabel">chiều · trời quang · âm thầm</span>
+  </div>
+
+  <!-- light + grain global overlays -->
+  <div class="light-overlay"></div>
+  <div class="grain-overlay"></div>
+
+  <!-- farewell -->
+  <div class="farewell" id="farewell">
+    <img src="assets/lantern.svg" class="lan" alt="">
+    <div class="text">Hẹn gặp Mẹ ngày mai.</div>
+    <div class="sub">— ngủ ngon, Mẹ —</div>
+  </div>
+</div>
+
+<script>
+  /* ── Time-of-day ─────────────────────────────────────────────── */
+  const TODs = ['sunrise', 'noon', 'sunset', 'night'];
+  const TOD_LABELS = {
+    sunrise: 'sáng sớm · chim hót · âm thầm',
+    noon:    'trưa · trời sáng · âm thầm',
+    sunset:  'chiều · trời quang · âm thầm',
+    night:   'đêm · đèn lồng sáng · dế kêu'
+  };
+  const TOD_GREETING = {
+    sunrise: '— sáng sớm, mặt trời đang lên. Mẹ dậy sớm vậy ạ —',
+    noon:    '— giữa trưa, nắng ấm. Mẹ nghỉ một chút nhé —',
+    sunset:  '— buổi chiều, mặt trời đang xuống. Mẹ về rồi ạ —',
+    night:   '— đã khuya, đèn lồng còn sáng. Mẹ vào cho ấm —'
+  };
+
+  function setTOD(tod) {
+    const stage = document.getElementById('stage');
+    stage.setAttribute('data-tod', tod);
+    document.getElementById('ambientLabel').textContent = TOD_LABELS[tod];
+    document.getElementById('greetingText').textContent = TOD_GREETING[tod];
+  }
+  function cycleTOD() {
+    const cur = document.getElementById('stage').getAttribute('data-tod');
+    const next = TODs[(TODs.indexOf(cur) + 1) % TODs.length];
+    setTOD(next);
+  }
+  (function initTOD() {
+    const h = new Date().getHours();
+    let tod = 'noon';
+    if (h < 6 || h >= 21) tod = 'night';
+    else if (h < 10)      tod = 'sunrise';
+    else if (h < 16)      tod = 'noon';
+    else                  tod = 'sunset';
+    setTOD(tod);
+  })();
+
+  /* ── Door interactions ──────────────────────────────────────── */
+  const door = document.getElementById('door');
+  const knocker = document.getElementById('knocker');
+  const doorScreen = document.getElementById('doorScreen');
+  const hub = document.getElementById('hub');
+
+  function openHouse() {
+    door.classList.add('opening');
+    setTimeout(() => {
+      doorScreen.classList.add('gone');
+      hub.classList.add('shown');
+      hub.setAttribute('aria-hidden', 'false');
+      document.getElementById('toolbar').classList.add('shown');
+      document.getElementById('ambientPill').classList.add('shown');
+      document.getElementById('closeHint').classList.add('shown');
+    }, 850);
+  }
+
+  // Tap the knocker -> knock animation -> door opens shortly after.
+  // Tap anywhere on the door also opens it directly (more forgiving).
+  knocker.addEventListener('click', e => {
+    e.stopPropagation();
+    knocker.classList.add('knock');
+    setTimeout(() => knocker.classList.remove('knock'), 700);
+    setTimeout(openHouse, 520);
+  });
+  door.addEventListener('click', () => {
+    if (!door.classList.contains('opening')) openHouse();
+  });
+
+  /* ── Room navigation (placeholders — links would go to room pages) ── */
+  document.querySelectorAll('.room-hot').forEach(el => {
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      // soft "press" feedback. Real app would route to /rooms/<key>
+      el.animate(
+        [{ transform: 'scale(1.012)' }, { transform: 'translateY(1px) scale(0.99)' }, { transform: 'scale(1.012)' }],
+        { duration: 380, easing: 'cubic-bezier(0.22, 0.9, 0.32, 1)' }
+      );
+    });
+  });
+
+  /* ── Mute (default ON, per brief) ──────────────────────────── */
+  let muted = true;
+  function toggleMute() {
+    muted = !muted;
+    document.getElementById('muteBtn').textContent = muted ? '♪' : '♫';
+  }
+
+  /* ── Farewell ──────────────────────────────────────────────── */
+  function farewell() {
+    document.getElementById('farewell').classList.add('show');
+    setTimeout(() => {
+      document.getElementById('farewell').classList.remove('show');
+    }, 4500);
+  }
+</script>
+</body>
+</html>

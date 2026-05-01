@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Component · Logbook Entry</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 22px 28px; background: var(--paper-cream); font-family: var(--font-serif); color: var(--ink); }
+  .head { font-family: var(--font-hand); font-size: 24px; margin: 0 0 12px; }
+  .ledger { background: #faf2dc; border: 1px solid rgba(90,69,48,0.18); padding: 12px 18px; box-shadow: var(--shadow-paper); }
+  .entry { display: grid; grid-template-columns: 90px 1fr auto; gap: 16px; padding: 8px 0; border-bottom: 1px dashed rgba(90,69,48,0.25); align-items: baseline; }
+  .entry:last-child { border-bottom: none; }
+  .entry .date { font-style: italic; color: var(--ink-faded); font-size: 13px; }
+  .entry .what { color: var(--ink); font-size: 15px; }
+  .entry .who { font-style: italic; color: var(--ink-soft); font-size: 12px; }
+  .lantern-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--lantern-yellow); box-shadow: 0 0 6px var(--lantern-glow); margin-right: 8px; vertical-align: middle; }
+</style>
+</head>
+<body>
+<h3 class="head">Sổ cái — by the front door</h3>
+<div class="ledger">
+  <div class="entry"><span class="date">Th4 · 28</span><span class="what"><span class="lantern-dot"></span>một bài hát mới trong Phòng Nhạc</span><span class="who">Con Trai</span></div>
+  <div class="entry"><span class="date">Th4 · 27</span><span class="what"><span class="lantern-dot"></span>bức tranh mới ở Phòng Gia Đình</span><span class="who">cháu An</span></div>
+  <div class="entry"><span class="date">Th4 · 25</span><span class="what">một thư mới trong Thư Viện</span><span class="who">Con Gái</span></div>
+  <div class="entry"><span class="date">Th4 · 22</span><span class="what">ghim mới trên Bản Đồ — Đà Lạt</span><span class="who">Bố</span></div>
+</div>
+</body>
+</html>

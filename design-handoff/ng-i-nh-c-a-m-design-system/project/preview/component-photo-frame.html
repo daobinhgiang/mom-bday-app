@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Component · Photo Frame</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 22px; background: var(--wall-ochre); display:flex; gap: 22px; align-items: center; justify-content:center; min-height: 100vh; }
+  .frame { width: 200px; background: var(--wood-teak-dark); padding: 12px 12px 30px; box-shadow: var(--shadow-object); transform: rotate(-3deg); }
+  .frame .photo { aspect-ratio: 4/3; background: linear-gradient(160deg,#b58860,#5e3a1a); border: 1px solid #2a1810; }
+  .frame .cap { font-family: var(--font-hand); font-size: 18px; color: var(--paper-cream); text-align: center; margin-top: 10px; }
+  .f2 { transform: rotate(2deg); background: var(--wood-teak); }
+  .f2 .photo { background: linear-gradient(160deg,#d8a98a,#8b5a2b); }
+  .f2 .cap { color: var(--paper-cream); }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="photo"></div>
+  <div class="cap">Tết · 2024</div>
+</div>
+<div class="frame f2">
+  <div class="photo"></div>
+  <div class="cap">đi biển cùng nhau</div>
+</div>
+</body>
+</html>

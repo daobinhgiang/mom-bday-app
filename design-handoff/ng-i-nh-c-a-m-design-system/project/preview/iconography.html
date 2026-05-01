@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Iconography</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 22px 26px; background: var(--paper-cream); font-family: var(--font-serif); color: var(--ink); }
+  .head { font-family: var(--font-hand); font-size: 24px; margin: 0 0 4px; }
+  .sub { font-style: italic; font-size: 12px; color: var(--ink-soft); margin: 0 0 18px; }
+  .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  .icon { background: var(--paper-cream-warm); border: 1px solid rgba(58,40,24,0.14); border-radius: var(--radius-soft); padding: 14px 10px; display:flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: var(--shadow-paper); }
+  .icon img { width: 44px; height: 44px; }
+  .icon .name { font-size: 11px; color: var(--ink-soft); font-style: italic; }
+</style>
+</head>
+<body>
+<h3 class="head">Painted glyphs — the only "icons" in the system</h3>
+<p class="sub">No icon font. No emoji. No Lucide. Painted SVGs only — and there are very few of them.</p>
+<div class="row">
+  <div class="icon"><img src="../assets/house-glyph.svg"/><div class="name">house · return</div></div>
+  <div class="icon"><img src="../assets/lantern.svg"/><div class="name">lantern · new</div></div>
+  <div class="icon"><img src="../assets/bookmark.svg"/><div class="name">bookmark</div></div>
+  <div class="icon"><img src="../assets/folded-note.svg"/><div class="name">folded note</div></div>
+  <div class="icon" style="font-family:var(--font-serif);font-size:32px;color:var(--ink)">←<div class="name">back · logbook only</div></div>
+</div>
+</body>
+</html>
