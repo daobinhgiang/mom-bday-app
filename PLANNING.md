@@ -85,7 +85,130 @@ One line each: **Art** (illustrator) · **Product** (you).
 | **C** | Uploads, **`visible_from`**, jobs for scheduled letters / rotations |
 | **D** | Weather (city or coarse geo); cheap audio‑reactive motion |
 
-**Rendering:** Prefer **layered PNG/WebP + SVG accents** for illustrator workflow; add canvas/WebGL later only for rain/particles if needed.
+**Rendering:** SVG overlay + raster textures (see below). Canvas/WebGL later only for rain/particles if needed.
+
+---
+
+## SVG overlay architecture
+
+### Concept
+
+Each room is a **full-scene raster PNG** (AI-generated) with an **invisible SVG layer** on top. Clickable items are **separate transparent PNGs** composited as `<image>` elements inside the SVG. This gives us DOM-level hit-testing, CSS effects, and art-swappable structure — without hand-drawing vector art.
+
+### What to generate (AI image generation)
+
+| Asset | Format | Notes |
+|-------|--------|-------|
+| Room background | PNG/WebP | Full scene — walls, floor, furniture, lighting. One per room. |
+| Clickable items | PNG, transparent bg | One per interactable (bookshelf, record player, photo frame, etc.). Must match perspective/scale of the room background it sits on. |
+
+**Tip:** Generate the full room first, then generate each item in the same style/angle — or use AI background removal to isolate items from the full scene.
+
+### How it works
+
+```
++---------------------------+
+|  <div class="room">       |
+|    <img> room-bg.png      |   <-- full raster background
+|    <svg viewBox overlay>   |   <-- same dimensions, sits on top
+|      <g id="bookshelf">   |
+|        <image> item.png   |   <-- positioned to align with bg
+|      </g>                 |
+|      <g id="record">      |
+|        <image> item.png   |
+|      </g>                 |
+|    </svg>                 |
++---------------------------+
+```
+
+### SVG structure per room
+
+```xml
+<div class="room" id="room-library">
+  <img src="rooms/library-bg.png" class="room-bg" />
+  <svg viewBox="0 0 1024 1024" class="room-overlay">
+
+    <g id="bookshelf" class="interactable"
+       data-type="poem" data-content-id="poem-1"
+       role="button" aria-label="Bookshelf — click to read">
+      <image href="items/bookshelf.png" x="120" y="400" width="200" height="300" />
+    </g>
+
+    <g id="vinyl-player" class="interactable"
+       data-type="music" data-content-id="song-1"
+       role="button" aria-label="Record player — click to listen">
+      <image href="items/vinyl-player.png" x="600" y="500" width="180" height="150" />
+    </g>
+
+  </svg>
+</div>
+```
+
+### CSS effects on interactables
+
+```css
+.room {
+  position: relative;
+  display: inline-block;
+}
+.room-bg {
+  width: 100%;
+  display: block;
+}
+.room-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+}
+
+/* Hover: glow + slight scale */
+.interactable {
+  cursor: pointer;
+  transition: filter 0.3s ease, transform 0.3s ease;
+  transform-origin: center;
+}
+.interactable:hover {
+  filter: drop-shadow(0 0 12px rgba(212, 168, 67, 0.7));
+  transform: scale(1.05);
+}
+
+/* Click: zoom in */
+.interactable.active {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 20px rgba(255, 234, 167, 0.9));
+}
+```
+
+### JS handler (generic, data-driven)
+
+```js
+document.querySelectorAll('.interactable').forEach(el => {
+  el.addEventListener('click', () => {
+    const { type, contentId } = el.dataset;
+    openContent(type, contentId);  // one function handles all content types
+  });
+});
+```
+
+Adding a new interactable = adding a `<g>` with `data-*` attributes. No new JS needed.
+
+### Effects summary
+
+| Effect | How | Separate item PNG needed? |
+|--------|-----|---------------------------|
+| Gold glow on hover | `filter: drop-shadow()` on SVG `<g>` | Yes (for glow to trace item shape) |
+| Scale / zoom | `transform: scale()` on SVG `<g>` | Yes (item lifts off background) |
+| Shadow / lift | `filter: drop-shadow()` | Yes |
+| Color tint | `filter: sepia() hue-rotate()` | Yes |
+| Outline highlight | SVG `<rect>` stroke behind `<image>` | No (but looks less polished) |
+
+### Workflow
+
+1. **AI generates** room backgrounds + individual item PNGs (pixel art / isometric style)
+2. **Engineer builds** SVG overlay per room — positions `<image>` elements to align with background
+3. **CSS handles** all hover/click effects — no per-item JS
+4. **Content system** maps `data-content-id` to the actual content (poem, song, photo, memory)
+5. **Swapping art** = replace PNG files, adjust `x/y/width/height` if needed — structure and interactions unchanged
 
 ---
 
