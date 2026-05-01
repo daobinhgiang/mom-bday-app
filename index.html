@@ -947,7 +947,7 @@
 
     var url = 'https://www.googleapis.com/drive/v3/files'
       + '?q=' + encodeURIComponent("'" + DRIVE_FOLDER_ID + "' in parents and trashed=false")
-      + '&fields=' + encodeURIComponent('files(id,name,mimeType,description)')
+      + '&fields=' + encodeURIComponent('files(id,name,mimeType,description,thumbnailLink)')
       + '&orderBy=createdTime+desc'
       + '&pageSize=100'
       + '&key=' + DRIVE_API_KEY;
@@ -967,12 +967,21 @@
 
       wall.innerHTML = photos.map(function(f) {
         var caption = escapeHtml(f.description || f.name.replace(/\.[^.]+$/, ''));
-        var src = 'https://drive.google.com/thumbnail?id=' + f.id + '&sz=w1000';
+        // Use Drive's own thumbnailLink (already rate-limit friendly) with larger size
+        var src = f.thumbnailLink
+          ? f.thumbnailLink.replace(/=s\d+/, '=s400')
+          : 'https://drive.google.com/thumbnail?id=' + f.id + '&sz=w400';
         return '<div class="frame">'
-          + '<img src="' + src + '" alt="' + caption + '" loading="lazy">'
+          + '<img data-src="' + src + '" alt="' + caption + '" loading="lazy">'
           + '<div class="cap">' + caption + '</div>'
           + '</div>';
       }).join('');
+
+      // Stagger image loads to avoid 429 rate limiting
+      var imgs = wall.querySelectorAll('img[data-src]');
+      imgs.forEach(function(img, i) {
+        setTimeout(function() { img.src = img.dataset.src; }, i * 800);
+      });
     }).catch(function(err) {
       familyPhotosLoaded = false;
       wall.innerHTML = '<div class="photo-status">Không tải được ảnh. (' + escapeHtml(err.message) + ')</div>';
