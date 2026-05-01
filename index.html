@@ -51,7 +51,7 @@
     --ink:                #3a2818;
     --ink-soft:           #5a4530;
     --ink-faded:          #8a6f50;
-    --ink-ghost:          #b39c7a;
+    --ink-ghost:          #e8d5b5;
 
     /* Time of day */
     --light-sunrise:      #f5c97a;
@@ -833,7 +833,7 @@
     },
     family: {
       title: 'Phòng Gia Đình',
-      desc: 'Bức tường đầy ảnh và hình vẽ của các cháu.',
+      desc: 'Bức tường đầy ảnh và hình vẽ.',
       body: '<div class="photo-wall" id="photo-wall">'
         + '<div class="photo-status">Đang tải ảnh...</div>'
         + '</div>'
@@ -931,15 +931,16 @@
   /* ── Supabase ───────────────────────────────────────────────── */
   var SUPABASE_URL = 'https://cqkeywtqberpegxorbna.supabase.co';
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxa2V5d3RxYmVycGVneG9yYm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MzEyMTMsImV4cCI6MjA5MzIwNzIxM30.xj_utioyHM8p2-SpWudvjfam1ZoRmKIXbI-4HTkoXEA';
-  var supabase = null;
+  var sb = null;
 
   function initSupabase() {
-    if (supabase) return;
-    if (typeof window.supabase === 'undefined' || !window.supabase.createClient) {
+    if (sb) return;
+    var lib = window.supabase;
+    if (!lib || !lib.createClient) {
       console.warn('Supabase JS not loaded yet');
       return;
     }
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    sb = lib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
 
   /* ── Family Photos (from Supabase Storage) ─────────────────── */
@@ -959,13 +960,13 @@
     if (!wall) return;
 
     initSupabase();
-    if (!supabase) {
+    if (!sb) {
       wall.innerHTML = '<div class="photo-status">Chưa kết nối Supabase.</div>';
       familyPhotosLoaded = false;
       return;
     }
 
-    supabase.storage.from('family-photos').list('', {
+    sb.storage.from('family-photos').list('', {
       limit: 100,
       sortBy: { column: 'created_at', order: 'desc' }
     }).then(function(result) {
@@ -981,7 +982,8 @@
       }
 
       wall.innerHTML = photos.map(function(f) {
-        var caption = escapeHtml(f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '));
+        var raw = f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+        var caption = escapeHtml(raw.charAt(0).toUpperCase() + raw.slice(1));
         var src = SUPABASE_URL
           + '/storage/v1/object/public/family-photos/'
           + encodeURIComponent(f.name);
