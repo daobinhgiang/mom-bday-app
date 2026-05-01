@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sách của Bố</title>
+  <style>
+    html, body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background:
+        radial-gradient(ellipse at top, #6b4423 0%, #3e2410 70%, #2a1808 100%);
+      color: #f4e3c1;
+      overflow-x: hidden;
+    }
+
+    .wrap {
+      min-height: 100vh;
+      padding: 40px 24px 80px;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: clamp(36px, 6vw, 64px);
+      margin: 0 0 8px;
+      letter-spacing: 2px;
+      color: #f4d990;
+      text-shadow:
+        0 2px 0 #2a1808,
+        0 0 18px rgba(255, 200, 100, 0.35);
+    }
+
+    .subtitle {
+      text-align: center;
+      font-style: italic;
+      color: #d8b889;
+      margin: 0 0 32px;
+      opacity: 0.85;
+    }
+
+    .back {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: #f4d990;
+      text-decoration: none;
+      padding: 8px 14px;
+      border: 1px solid #8b5a2b;
+      border-radius: 6px;
+      background: rgba(0,0,0,0.25);
+      font-size: 14px;
+      z-index: 100;
+    }
+    .back:hover { background: #8b5a2b; color: #fff8e7; }
+
+    .shelf-area {
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+      min-height: 70vh;
+      padding: 20px;
+    }
+
+    /* Three wooden shelf planks */
+    .plank {
+      position: absolute;
+      left: 0; right: 0;
+      height: 18px;
+      background:
+        linear-gradient(180deg, #5a3418 0%, #3e2410 50%, #2a1808 100%);
+      border-top: 2px solid #7a4a25;
+      border-bottom: 2px solid #1a0e05;
+      box-shadow:
+        0 6px 14px rgba(0,0,0,0.55),
+        inset 0 1px 0 rgba(255,200,140,0.15);
+      border-radius: 2px;
+    }
+    .plank.p1 { top: 220px; }
+    .plank.p2 { top: 430px; }
+    .plank.p3 { top: 640px; }
+
+    .row {
+      position: absolute;
+      left: 24px; right: 24px;
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      height: 200px;
+      padding: 0 12px;
+      flex-wrap: wrap;
+    }
+    .row.r1 { top: 20px; }
+    .row.r2 { top: 230px; }
+    .row.r3 { top: 440px; }
+
+    /* Brown book — draggable & clickable */
+    .book {
+      position: relative;
+      display: inline-block;
+      width: 38px;
+      height: 160px;
+      border-radius: 3px 3px 2px 2px;
+      cursor: grab;
+      user-select: none;
+      transition: filter 180ms ease, transform 180ms ease;
+      flex: 0 0 auto;
+      color: #f4e3c1;
+      text-decoration: none;
+      box-shadow:
+        inset 0 0 0 1px rgba(0,0,0,0.4),
+        inset 2px 0 0 rgba(255,255,255,0.08),
+        inset -2px 0 0 rgba(0,0,0,0.35),
+        0 4px 6px rgba(0,0,0,0.45);
+    }
+
+    .book::before {
+      /* spine ridges */
+      content: "";
+      position: absolute;
+      left: 4px; right: 4px;
+      top: 14px; bottom: 14px;
+      border-top: 2px solid rgba(255, 220, 160, 0.25);
+      border-bottom: 2px solid rgba(255, 220, 160, 0.25);
+      pointer-events: none;
+    }
+    .book::after {
+      /* gold band / title strip */
+      content: "";
+      position: absolute;
+      left: 4px; right: 4px;
+      top: 50%;
+      height: 26px;
+      transform: translateY(-50%);
+      background:
+        linear-gradient(180deg, rgba(255,210,130,0.35), rgba(180,130,60,0.25));
+      border-top: 1px solid rgba(255,220,160,0.5);
+      border-bottom: 1px solid rgba(0,0,0,0.4);
+      pointer-events: none;
+    }
+
+    .book .title {
+      position: absolute;
+      left: 0; right: 0;
+      top: 50%;
+      transform: translateY(-50%) rotate(-90deg);
+      text-align: center;
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: #fff3d0;
+      text-shadow: 0 1px 0 rgba(0,0,0,0.6);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* Brown shade variations */
+    .book.b1 { background: linear-gradient(90deg, #4a2511 0%, #6b3a1a 50%, #4a2511 100%); height: 170px; }
+    .book.b2 { background: linear-gradient(90deg, #5e3416 0%, #8b5a2b 50%, #5e3416 100%); height: 150px; width: 42px; }
+    .book.b3 { background: linear-gradient(90deg, #3a1f0c 0%, #5a3418 50%, #3a1f0c 100%); height: 165px; width: 36px; }
+    .book.b4 { background: linear-gradient(90deg, #6b3a1a 0%, #92602f 50%, #6b3a1a 100%); height: 155px; width: 40px; }
+    .book.b5 { background: linear-gradient(90deg, #2e1a0a 0%, #4a2511 50%, #2e1a0a 100%); height: 175px; width: 34px; }
+    .book.b6 { background: linear-gradient(90deg, #5a3418 0%, #7a4a25 50%, #5a3418 100%); height: 160px; width: 44px; }
+    .book.b7 { background: linear-gradient(90deg, #4a2a14 0%, #7a4a25 50%, #4a2a14 100%); height: 145px; width: 38px; }
+
+    .book:hover,
+    .book:focus-visible {
+      filter:
+        drop-shadow(0 0 8px #ffcc66)
+        drop-shadow(0 0 18px rgba(255, 180, 80, 0.7))
+        drop-shadow(0 0 30px rgba(255, 200, 100, 0.5));
+      transform: translateY(-6px);
+      outline: none;
+      z-index: 10;
+    }
+
+    .book.dragging {
+      cursor: grabbing;
+      z-index: 50;
+      filter:
+        drop-shadow(0 0 10px #ffcc66)
+        drop-shadow(0 0 22px rgba(255, 180, 80, 0.8));
+      transform: rotate(-3deg) scale(1.05);
+      transition: none;
+    }
+
+    .hint {
+      position: absolute;
+      bottom: 16px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 13px;
+      color: #c9a874;
+      font-style: italic;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="library.html">&larr; Thư viện</a>
+    <h1>Sách của Bố</h1>
+    <p class="subtitle">Hãy chọn một quyển để mở ra...</p>
+
+    <div class="shelf-area" id="shelfArea">
+      <div class="plank p1"></div>
+      <div class="plank p2"></div>
+      <div class="plank p3"></div>
+
+      <div class="row r1">
+        <a class="book b1" href="book-page.html?id=1" data-title="Hồi Ký"><span class="title">Hồi Ký</span></a>
+        <a class="book b2" href="book-page.html?id=2" data-title="Lịch Sử"><span class="title">Lịch Sử</span></a>
+        <a class="book b3" href="book-page.html?id=3" data-title="Triết Học"><span class="title">Triết Học</span></a>
+        <a class="book b4" href="book-page.html?id=4" data-title="Văn Học"><span class="title">Văn Học</span></a>
+        <a class="book b5" href="book-page.html?id=5" data-title="Thơ Ca"><span class="title">Thơ Ca</span></a>
+        <a class="book b6" href="book-page.html?id=6" data-title="Khoa Học"><span class="title">Khoa Học</span></a>
+        <a class="book b7" href="book-page.html?id=7" data-title="Kỷ Niệm"><span class="title">Kỷ Niệm</span></a>
+        <a class="book b2" href="book-page.html?id=8" data-title="Cuộc Đời"><span class="title">Cuộc Đời</span></a>
+      </div>
+
+      <div class="row r2">
+        <a class="book b3" href="book-page.html?id=9" data-title="Gia Đình"><span class="title">Gia Đình</span></a>
+        <a class="book b1" href="book-page.html?id=10" data-title="Quê Hương"><span class="title">Quê Hương</span></a>
+        <a class="book b6" href="book-page.html?id=11" data-title="Tình Yêu"><span class="title">Tình Yêu</span></a>
+        <a class="book b4" href="book-page.html?id=12" data-title="Bạn Bè"><span class="title">Bạn Bè</span></a>
+        <a class="book b5" href="book-page.html?id=13" data-title="Tuổi Trẻ"><span class="title">Tuổi Trẻ</span></a>
+        <a class="book b7" href="book-page.html?id=14" data-title="Nghề Nghiệp"><span class="title">Nghề Nghiệp</span></a>
+        <a class="book b2" href="book-page.html?id=15" data-title="Đam Mê"><span class="title">Đam Mê</span></a>
+        <a class="book b3" href="book-page.html?id=16" data-title="Du Ký"><span class="title">Du Ký</span></a>
+      </div>
+
+      <div class="row r3">
+        <a class="book b5" href="book-page.html?id=17" data-title="Tản Văn"><span class="title">Tản Văn</span></a>
+        <a class="book b4" href="book-page.html?id=18" data-title="Cổ Tích"><span class="title">Cổ Tích</span></a>
+        <a class="book b1" href="book-page.html?id=19" data-title="Chính Trị"><span class="title">Chính Trị</span></a>
+        <a class="book b6" href="book-page.html?id=20" data-title="Kinh Tế"><span class="title">Kinh Tế</span></a>
+        <a class="book b3" href="book-page.html?id=21" data-title="Báo Chí"><span class="title">Báo Chí</span></a>
+        <a class="book b7" href="book-page.html?id=22" data-title="Sổ Tay"><span class="title">Sổ Tay</span></a>
+        <a class="book b2" href="book-page.html?id=23" data-title="Nhật Ký"><span class="title">Nhật Ký</span></a>
+        <a class="book b1" href="book-page.html?id=24" data-title="Suy Ngẫm"><span class="title">Suy Ngẫm</span></a>
+      </div>
+
+      <p class="hint">Giữ và kéo để di chuyển sách — bấm để mở</p>
+    </div>
+  </div>
+
+  <script>
+    // Drag-to-move with click-vs-drag distinction.
+    // Short press + release = navigate; mousedown + significant move = drag (no nav).
+    const DRAG_THRESHOLD = 5; // pixels
+
+    document.querySelectorAll('.book').forEach((book) => {
+      let startX = 0, startY = 0;
+      let offsetX = 0, offsetY = 0;
+      let isDragging = false;
+      let moved = false;
+      let originalParent = null;
+      let originalNext = null;
+
+      book.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        startX = e.clientX;
+        startY = e.clientY;
+        moved = false;
+        isDragging = true;
+
+        const rect = book.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        if (!moved && Math.hypot(dx, dy) > DRAG_THRESHOLD) {
+          moved = true;
+          // promote to absolute positioning, keep current visual position
+          const rect = book.getBoundingClientRect();
+          originalParent = book.parentElement;
+          originalNext = book.nextElementSibling;
+          document.body.appendChild(book);
+          book.classList.add('dragging');
+          book.style.position = 'fixed';
+          book.style.left = rect.left + 'px';
+          book.style.top = rect.top + 'px';
+          book.style.margin = '0';
+        }
+
+        if (moved) {
+          book.style.left = (e.clientX - offsetX) + 'px';
+          book.style.top = (e.clientY - offsetY) + 'px';
+        }
+      });
+
+      document.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        // keep dragged position; don't snap back. Just clean classes.
+        if (moved) {
+          book.classList.remove('dragging');
+        }
+      });
+
+      // Suppress click navigation if a drag actually happened.
+      book.addEventListener('click', (e) => {
+        if (moved) {
+          e.preventDefault();
+          moved = false;
+        }
+      });
+
+      // Keep keyboard activation (Enter on focused link) working normally.
+    });
+  </script>
+</body>
+</html>

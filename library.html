@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Library</title>
+  <style>
+    html, body {
+      margin: 0;
+      background: #1a1a2e;
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, sans-serif;
+    }
+
+    .scene {
+      position: relative;
+      width: min(90vw, 720px);
+      aspect-ratio: 1 / 1;
+      image-rendering: pixelated;
+    }
+
+    .scene > img.base {
+      width: 100%;
+      height: 100%;
+      display: block;
+      image-rendering: pixelated;
+      position: relative;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .shelf {
+      position: absolute;
+      display: block;
+      cursor: pointer;
+      transition: filter 160ms ease, transform 160ms ease;
+      filter: drop-shadow(0 0 0 transparent);
+      z-index: 1;
+    }
+
+    .shelf img {
+      width: auto;
+      height: 100%;
+      display: block;
+      image-rendering: pixelated;
+      pointer-events: none;
+    }
+
+    .shelf:hover,
+    .shelf:focus-visible {
+      filter:
+        drop-shadow(0 0 6px #ffe066)
+        drop-shadow(0 0 14px #ffd43b)
+        drop-shadow(0 0 24px rgba(255, 212, 59, 0.6));
+      transform: translateY(-2px);
+      outline: none;
+    }
+
+    /* Tune these positions to match your art. Each shelf is anchored by
+       its top-left corner; height is a % of the scene height (width is auto
+       so each shelf keeps its native aspect ratio). */
+
+    /* Back-left wall (far → near, i.e. back corner → front-left) */
+    .shelf-1 { top:  6%; left: 28%; height: 60%; }
+    .shelf-2 { top: 13%; left: 17%; height: 60%; }
+    .shelf-3 { top: 20%; left:  6%; height: 60%; }
+
+    /* Back-right wall (far → near, i.e. back corner → front-right) */
+    .shelf-4 { top:  6%; left: 51%; height: 60%; }
+    .shelf-5 { top: 13%; left: 62%; height: 60%; }
+    .shelf-6 { top: 20%; left: 73%; height: 60%; }
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <img class="base" src="images/library-room/library crop.png" alt="Library room" />
+
+    <a class="shelf shelf-1" href="shelf-1.html" aria-label="Open bookshelf 1">
+      <img src="images/library-room/bookshelf 1.png" alt="" />
+    </a>
+    <a class="shelf shelf-2" href="shelf-2.html" aria-label="Open bookshelf 2">
+      <img src="images/library-room/bookshelf 2.png" alt="" />
+    </a>
+    <a class="shelf shelf-3" href="shelf-3.html" aria-label="Open bookshelf 3">
+      <img src="images/library-room/bookshelf 3.png" alt="" />
+    </a>
+    <a class="shelf shelf-4" href="shelf-4.html" aria-label="Open bookshelf 4">
+      <img src="images/library-room/bookshelf 4.png" alt="" />
+    </a>
+    <a class="shelf shelf-5" href="shelf-5.html" aria-label="Open bookshelf 5">
+      <img src="images/library-room/bookshelf 5.png" alt="" />
+    </a>
+    <a class="shelf shelf-6" href="shelf-6.html" aria-label="Open bookshelf 6">
+      <img src="images/library-room/bookshelf 6.png" alt="" />
+    </a>
+  </div>
+</body>
+</html>
