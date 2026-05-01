@@ -538,6 +538,22 @@
   .frame .photo.p6 { background: linear-gradient(160deg, #8aa3b5, #3a4f6e); }
   .frame .cap { font-family: var(--font-hand); font-size: 18px; color: var(--paper-cream); text-align: center; margin-top: 8px; }
   .frame .author { font-family: var(--font-serif); font-style: italic; font-size: 11px; color: rgba(244,234,215,0.6); text-align: center; margin-top: 2px; }
+  .frame img {
+    width: 100%; aspect-ratio: 4/3;
+    object-fit: cover;
+    border: 1px solid rgba(0,0,0,0.4);
+    display: block;
+    background: linear-gradient(160deg, #b58860, #5e3a1a);
+  }
+  .photo-status {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ink-ghost);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.95rem;
+  }
 
   /* =========================================================================
      BEDROOM — Room Illustration
@@ -809,13 +825,8 @@
     family: {
       title: 'Phòng Gia Đình',
       desc: 'Bức tường đầy ảnh và hình vẽ của các cháu.',
-      body: '<div class="photo-wall">'
-        + '<div class="frame"><div class="photo"></div><div class="cap">Tết · 2024</div><div class="author">— gia đình</div></div>'
-        + '<div class="frame"><div class="photo p2"></div><div class="cap">Bà Ngoại của bé Minh</div><div class="author">— bé Minh, 5 tuổi</div></div>'
-        + '<div class="frame"><div class="photo p3"></div><div class="cap">đi biển cùng nhau</div><div class="author">— hè 2023</div></div>'
-        + '<div class="frame"><div class="photo p4"></div><div class="cap">vườn nhà Mẹ</div><div class="author">— Con Gái</div></div>'
-        + '<div class="frame"><div class="photo p5"></div><div class="cap">sinh nhật Mẹ năm ngoái</div><div class="author">— 2025</div></div>'
-        + '<div class="frame"><div class="photo p6"></div><div class="cap">"Con yêu Bà"</div><div class="author">— bé An</div></div>'
+      body: '<div class="photo-wall" id="photo-wall">'
+        + '<div class="photo-status">Đang tải ảnh...</div>'
         + '</div>'
     },
     bedroom: {
@@ -852,6 +863,7 @@
     document.getElementById('roomDesc').textContent = r.desc;
     document.getElementById('roomBody').innerHTML = r.body;
     document.getElementById('room-view').classList.add('show');
+    if (key === 'family') loadFamilyPhotos();
   }
 
   function goHome() {
@@ -906,6 +918,58 @@
     else tod = 'sunset';
     setTOD(tod);
   })();
+
+  /* ── Google Drive: Family Photos ─────────────────────────────── */
+  var DRIVE_FOLDER_ID = '1yNWI9_fKcAmIcItrkE3KTFYLIneVwq2C';
+  var DRIVE_API_KEY = 'AIzaSyCwFRhJVfUdfj4p1sQ0OHI1yyhSNnEKP7s';
+  var familyPhotosLoaded = false;
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function(c) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function loadFamilyPhotos() {
+    if (familyPhotosLoaded) return;
+    familyPhotosLoaded = true;
+
+    var wall = document.getElementById('photo-wall');
+    if (!wall) return;
+
+    var url = 'https://www.googleapis.com/drive/v3/files'
+      + '?q=' + encodeURIComponent("'" + DRIVE_FOLDER_ID + "' in parents and trashed=false")
+      + '&fields=' + encodeURIComponent('files(id,name,mimeType,description)')
+      + '&orderBy=createdTime+desc'
+      + '&pageSize=100'
+      + '&key=' + DRIVE_API_KEY;
+
+    fetch(url).then(function(res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    }).then(function(data) {
+      var photos = (data.files || []).filter(function(f) {
+        return f.mimeType && f.mimeType.startsWith('image/');
+      });
+
+      if (photos.length === 0) {
+        wall.innerHTML = '<div class="photo-status">Chưa có ảnh trong thư mục.</div>';
+        return;
+      }
+
+      wall.innerHTML = photos.map(function(f) {
+        var caption = escapeHtml(f.description || f.name.replace(/\.[^.]+$/, ''));
+        var src = 'https://drive.google.com/thumbnail?id=' + f.id + '&sz=w1000';
+        return '<div class="frame">'
+          + '<img src="' + src + '" alt="' + caption + '" loading="lazy">'
+          + '<div class="cap">' + caption + '</div>'
+          + '</div>';
+      }).join('');
+    }).catch(function(err) {
+      familyPhotosLoaded = false;
+      wall.innerHTML = '<div class="photo-status">Không tải được ảnh. (' + escapeHtml(err.message) + ')</div>';
+    });
+  }
 </script>
 
 </body>
