@@ -254,12 +254,12 @@
   /* =========================================================================
      HUB (HOUSE CROSS-SECTION)
      ========================================================================= */
-  #hub { position: relative; min-height: 100vh; padding: 32px 24px 80px; }
+  #hub { position: relative; min-height: 100vh; padding: 16px 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
   #hub.hide { display: none; }
 
-  .hub-header { text-align: center; margin-bottom: 18px; position: relative; z-index: 2; }
+  .hub-header { text-align: center; margin-bottom: 10px; position: relative; z-index: 2; flex-shrink: 0; }
   .hub-header h1 {
-    font-family: var(--font-hand); font-size: 56px; color: var(--ink);
+    font-family: var(--font-hand); font-size: 44px; color: var(--ink);
     margin: 0; line-height: 1; letter-spacing: -0.01em;
   }
   .hub-header .greeting {
@@ -268,12 +268,15 @@
   }
 
   .house {
-    max-width: 1100px; margin: 0 auto; position: relative;
-    aspect-ratio: 1200 / 700;
+    width: min(100%, calc((100vh - 32px) * 1248 / 863));
+    margin: 0 auto; position: relative;
+    aspect-ratio: 1248 / 863;
   }
   .house-bg {
     position: absolute; inset: 0; width: 100%; height: 100%;
     pointer-events: none;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
   }
 
   /* Clickable room hot zones */
@@ -348,6 +351,22 @@
     width: 8px; height: 8px; border-radius: 50%; background: var(--lantern-yellow);
     box-shadow: 0 0 8px var(--lantern-glow);
   }
+
+  /* Fullscreen toggle — bottom-center, overlaps the house */
+  .fs-btn {
+    position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+    z-index: 60;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--paper-cream-warm);
+    border: 1px solid rgba(58,40,24,0.2);
+    box-shadow: var(--shadow-paper);
+    font-family: var(--font-serif); font-size: 20px; color: var(--ink);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform var(--dur-quick) var(--ease-settle);
+  }
+  .fs-btn:hover { transform: translateX(-50%) translateY(-2px); }
+  .fs-btn:active { transform: translateX(-50%) translateY(1px) scale(0.97); }
 
   /* =========================================================================
      ROOM VIEW — full-screen room panel
@@ -709,33 +728,28 @@
 
   <!-- HUB -->
   <div id="hub" class="hide">
-    <div class="hub-header">
-      <h1>Ngôi Nhà Của Mẹ</h1>
-      <div class="greeting" id="greeting">— buổi trưa, trời sáng —</div>
-    </div>
-
     <div class="house">
-      <img src="assets/house-cross-section.svg" class="house-bg" alt=""/>
+      <img src="images/Gemini_Generated_Image_netfaznetfaznetf.png" class="house-bg" alt=""/>
 
-      <!-- Hot zones positioned over the cross-section SVG -->
-      <div class="room-hot" style="left: 10%; top: 31%; width: 20%; height: 30%" onclick="enterRoom('library')">
+      <!-- Hot zones positioned over the pixel-art house. Tweak left/top/width/height as needed. -->
+      <div class="room-hot" style="left: 7%; top: 28%; width: 17%; height: 28%" onclick="enterRoom('library')">
         <div class="room-tag">Thư Viện</div>
         <div class="room-lantern"><img src="assets/lantern.svg" alt=""/></div>
       </div>
-      <div class="room-hot" style="left: 30%; top: 31%; width: 20%; height: 30%" onclick="enterRoom('music')">
+      <div class="room-hot" style="left: 25%; top: 28%; width: 18%; height: 28%" onclick="enterRoom('music')">
         <div class="room-tag">Phòng Nhạc</div>
       </div>
-      <div class="room-hot" style="left: 50%; top: 31%; width: 20%; height: 30%" onclick="enterRoom('map')">
+      <div class="room-hot" style="left: 44%; top: 28%; width: 18%; height: 28%" onclick="enterRoom('map')">
         <div class="room-tag">Phòng Bản Đồ</div>
       </div>
-      <div class="room-hot" style="left: 70%; top: 31%; width: 20%; height: 30%" onclick="enterRoom('family')">
+      <div class="room-hot" style="left: 63%; top: 28%; width: 28%; height: 28%" onclick="enterRoom('family')">
         <div class="room-tag">Phòng Gia Đình</div>
         <div class="room-lantern"><img src="assets/lantern.svg" alt=""/></div>
       </div>
-      <div class="room-hot" style="left: 10%; top: 61%; width: 30%; height: 30%" onclick="enterRoom('bedroom')">
+      <div class="room-hot" style="left: 7%; top: 58%; width: 25%; height: 32%" onclick="enterRoom('bedroom')">
         <div class="room-tag">Phòng Ngủ</div>
       </div>
-      <div class="room-hot" style="left: 65%; top: 61%; width: 25%; height: 30%" onclick="enterRoom('garden')">
+      <div class="room-hot" style="left: 55%; top: 60%; width: 38%; height: 32%" onclick="enterRoom('garden')">
         <div class="room-tag">Vườn</div>
       </div>
     </div>
@@ -777,6 +791,9 @@
 
   <!-- AMBIENT PILL -->
   <div class="ambient-pill"><div class="dot"></div><span id="ambientLabel">trưa · trời sáng</span></div>
+
+  <!-- FULLSCREEN TOGGLE -->
+  <button class="fs-btn" id="fsBtn" onclick="toggleFullscreen()" title="Toàn màn hình">&#9974;</button>
 
   <!-- OVERLAYS -->
   <div class="light-overlay"></div>
@@ -1045,6 +1062,19 @@
       wall.innerHTML = '<div class="photo-status">Không tải được ảnh. (' + escapeHtml(err.message || err) + ')</div>';
     });
   }
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      var el = document.documentElement;
+      (el.requestFullscreen || el.webkitRequestFullscreen || function(){}).call(el);
+    } else {
+      (document.exitFullscreen || document.webkitExitFullscreen || function(){}).call(document);
+    }
+  }
+  document.addEventListener('fullscreenchange', function() {
+    var btn = document.getElementById('fsBtn');
+    if (btn) btn.innerHTML = document.fullscreenElement ? '&#10005;' : '&#9974;';
+  });
 </script>
 
 </body>
