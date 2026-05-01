@@ -37,14 +37,24 @@ python3 -m http.server 8000
 
 All state management is done via CSS class toggling (`.hidden`, `.active`, `.spinning`). There is no routing — everything lives on one page.
 
-## Customizing Content
+## Architecture
 
-All content is hardcoded in `index.html`. To personalize:
+```
+GitHub Pages          Supabase
+(static host)         (backend-as-a-service)
+┌──────────┐          ┌─────────────────────┐
+│index.html│ ──────►  │ Postgres (data)     │
+│  CSS/JS  │          │ Auth (logins)       │
+│          │          │ Storage (media)     │
+│          │          │ RLS (access rules)  │
+└──────────┘          └─────────────────────┘
+```
 
-- **Library**: Edit the `.book` divs (lines ~395-411) — change titles and memory quotes
-- **Music**: Edit the `.song-list li` items (lines ~422-443) — change song names and dedications
-- **Map**: Edit the `.map-pin` spans (lines ~458-469) — add/remove places, use classes `pin-lived`, `pin-visited`, or `pin-dream`
-- **Family**: Edit the `.photo-frame` divs (lines ~478-509) — change emoji placeholders, captions, and dates
+The frontend calls Supabase directly via its JS client — no separate backend server. Row-Level Security enforces access rules inside Postgres (e.g., Mom's journal is private unless she shares it).
+
+## Content Management
+
+Room content (book chapters, songs, map pins, photos, memory jar notes) is stored in Supabase. Family members log in with their own accounts to contribute content. Media files (photos, audio, voice memos) are uploaded to Supabase Storage.
 
 ## Deploying
 
@@ -114,26 +124,7 @@ Context7 fetches up-to-date library documentation so Claude Code has accurate AP
      }
    }
    ```
-2. Claude Code will automatically use this when you ask about library APIs (e.g. Google Drive API, Web Audio API).
-
-### Setting Up Google Drive (via gcloud CLI)
-
-Google Drive is used for storing app content (images, audio, documents). We use the `gcloud` CLI to sync files locally.
-
-1. Install gcloud CLI:
-   ```bash
-   curl -sSL https://sdk.cloud.google.com | bash -s -- --disable-prompts --install-dir=$HOME
-   source "$HOME/google-cloud-sdk/path.zsh.inc"
-   ```
-2. Authenticate:
-   ```bash
-   gcloud auth login
-   ```
-3. Enable the Drive API in your Google Cloud project:
-   ```bash
-   gcloud services enable drive.googleapis.com
-   ```
-4. Use `gsutil` or the Drive API to sync assets to/from the `images/` folder.
+2. Claude Code will automatically use this when you ask about library APIs (e.g. Supabase JS, Web Audio API).
 
 ### Other Useful MCP Servers
 
@@ -144,13 +135,14 @@ Google Drive is used for storing app content (images, audio, documents). We use 
 | **Slack** | Send updates to team channels |
 | **Google Calendar** | Schedule collaboration sessions |
 | **Notion** | Sync project docs and notes |
-| **Google Drive** | Content storage for app assets (community MCP, not official) |
 
 > **Tip**: Run `/help` inside Claude Code to see all available tools and MCP connections.
 
 ## Tech Stack
 
-- Pure HTML/CSS/JS (no frameworks)
-- Google Fonts: Playfair Display + Quicksand
+- **Frontend**: Vanilla HTML/CSS/JS + Web Components (no frameworks), hosted on GitHub Pages
+- **Backend**: Supabase (Postgres database, Auth, Storage, Row-Level Security)
+- **Fonts**: Google Fonts — Playfair Display + Quicksand
+- **Media**: All photos, audio, and voice memos served from Supabase Storage
 - CSS animations and transitions
 - Responsive design (mobile-friendly)
