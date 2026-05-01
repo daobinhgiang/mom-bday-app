@@ -5,9 +5,58 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ngôi Nhà Của Mẹ</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><text y='50' font-size='50'>🏠</text></svg>">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Kalam:wght@400;700&family=Patrick+Hand&subset=vietnamese&display=swap');
-
+  /* Self-hosted fonts (no Google Fonts CDN dependency) */
+  @font-face {
+    font-family: 'Lora';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('fonts/lora-v37-regular.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Lora';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('fonts/lora-v37-regular.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Lora';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('fonts/lora-v37-regular.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Lora';
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url('fonts/lora-v37-italic.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Kalam';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('fonts/kalam-v18-regular.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Kalam';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('fonts/kalam-v18-bold.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Patrick Hand';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('fonts/patrick-hand-v25-regular.woff2') format('woff2');
+  }
   @font-face {
     font-family: 'BeeLeave';
     src: url('fonts/BeeLeaveRegular-3zR66.ttf') format('truetype');
@@ -50,7 +99,7 @@
     --ink:                #3a2818;
     --ink-soft:           #5a4530;
     --ink-faded:          #8a6f50;
-    --ink-ghost:          #b39c7a;
+    --ink-ghost:          #e8d5b5;
 
     /* Time of day */
     --light-sunrise:      #f5c97a;
@@ -849,7 +898,7 @@
     },
     family: {
       title: 'Phòng Gia Đình',
-      desc: 'Bức tường đầy ảnh và hình vẽ của các cháu.',
+      desc: 'Bức tường đầy ảnh và hình vẽ.',
       body: '<div class="photo-wall" id="photo-wall">'
         + '<div class="photo-status">Đang tải ảnh...</div>'
         + '</div>'
@@ -944,9 +993,22 @@
     setTOD(tod);
   })();
 
-  /* ── Google Drive: Family Photos ─────────────────────────────── */
-  var DRIVE_FOLDER_ID = '1yNWI9_fKcAmIcItrkE3KTFYLIneVwq2C';
-  var DRIVE_API_KEY = 'AIzaSyCwFRhJVfUdfj4p1sQ0OHI1yyhSNnEKP7s';
+  /* ── Supabase ───────────────────────────────────────────────── */
+  var SUPABASE_URL = 'https://cqkeywtqberpegxorbna.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxa2V5d3RxYmVycGVneG9yYm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MzEyMTMsImV4cCI6MjA5MzIwNzIxM30.xj_utioyHM8p2-SpWudvjfam1ZoRmKIXbI-4HTkoXEA';
+  var sb = null;
+
+  function initSupabase() {
+    if (sb) return;
+    var lib = window.supabase;
+    if (!lib || !lib.createClient) {
+      console.warn('Supabase JS not loaded yet');
+      return;
+    }
+    sb = lib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+
+  /* ── Family Photos (from Supabase Storage) ─────────────────── */
   var familyPhotosLoaded = false;
 
   function escapeHtml(s) {
@@ -962,19 +1024,21 @@
     var wall = document.getElementById('photo-wall');
     if (!wall) return;
 
-    var url = 'https://www.googleapis.com/drive/v3/files'
-      + '?q=' + encodeURIComponent("'" + DRIVE_FOLDER_ID + "' in parents and trashed=false")
-      + '&fields=' + encodeURIComponent('files(id,name,mimeType,description,thumbnailLink)')
-      + '&orderBy=createdTime+desc'
-      + '&pageSize=100'
-      + '&key=' + DRIVE_API_KEY;
+    initSupabase();
+    if (!sb) {
+      wall.innerHTML = '<div class="photo-status">Chưa kết nối Supabase.</div>';
+      familyPhotosLoaded = false;
+      return;
+    }
 
-    fetch(url).then(function(res) {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
-    }).then(function(data) {
-      var photos = (data.files || []).filter(function(f) {
-        return f.mimeType && f.mimeType.startsWith('image/');
+    sb.storage.from('family-photos').list('', {
+      limit: 100,
+      sortBy: { column: 'created_at', order: 'desc' }
+    }).then(function(result) {
+      if (result.error) throw result.error;
+
+      var photos = (result.data || []).filter(function(f) {
+        return /\.(jpe?g|png|gif|webp)$/i.test(f.name);
       });
 
       if (photos.length === 0) {
@@ -983,25 +1047,19 @@
       }
 
       wall.innerHTML = photos.map(function(f) {
-        var caption = escapeHtml(f.description || f.name.replace(/\.[^.]+$/, ''));
-        // Use Drive's own thumbnailLink (already rate-limit friendly) with larger size
-        var src = f.thumbnailLink
-          ? f.thumbnailLink.replace(/=s\d+/, '=s400')
-          : 'https://drive.google.com/thumbnail?id=' + f.id + '&sz=w400';
+        var raw = f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+        var caption = escapeHtml(raw.charAt(0).toUpperCase() + raw.slice(1));
+        var src = SUPABASE_URL
+          + '/storage/v1/object/public/family-photos/'
+          + encodeURIComponent(f.name);
         return '<div class="frame">'
-          + '<img data-src="' + src + '" alt="' + caption + '" loading="lazy">'
+          + '<img src="' + src + '" alt="' + caption + '" loading="lazy">'
           + '<div class="cap">' + caption + '</div>'
           + '</div>';
       }).join('');
-
-      // Stagger image loads to avoid 429 rate limiting
-      var imgs = wall.querySelectorAll('img[data-src]');
-      imgs.forEach(function(img, i) {
-        setTimeout(function() { img.src = img.dataset.src; }, i * 800);
-      });
     }).catch(function(err) {
       familyPhotosLoaded = false;
-      wall.innerHTML = '<div class="photo-status">Không tải được ảnh. (' + escapeHtml(err.message) + ')</div>';
+      wall.innerHTML = '<div class="photo-status">Không tải được ảnh. (' + escapeHtml(err.message || err) + ')</div>';
     });
   }
 

@@ -1,0 +1,46 @@
+- generic [ref=e2]:
+  - generic:
+    - generic:
+      - generic: Mẹ
+    - generic: gõ cửa vào nhà
+    - generic: — chạm vào cửa để Mẹ vào
+  - generic [ref=e17]:
+    - generic [ref=e18]:
+      - heading "Ngôi Nhà Của Mẹ" [level=1] [ref=e19]
+      - generic [ref=e20]: — trưa, mặt trời trên cao —
+    - generic [ref=e21]:
+      - generic [ref=e22] [cursor=pointer]:
+        - generic: Thư Viện
+      - generic [ref=e23] [cursor=pointer]:
+        - generic: Phòng Nhạc
+      - generic [ref=e24] [cursor=pointer]:
+        - generic: Phòng Bản Đồ
+      - generic [ref=e25] [cursor=pointer]:
+        - generic: Phòng Gia Đình
+      - generic [ref=e26] [cursor=pointer]:
+        - generic: Phòng Ngủ
+      - generic [ref=e27] [cursor=pointer]:
+        - generic: Vườn
+  - generic:
+    - generic:
+      - generic "về nhà":
+        - img "về nhà"
+      - heading [level=2]
+      - paragraph
+  - generic:
+    - generic:
+      - button "×"
+      - generic:
+        - heading [level=3]
+        - paragraph
+        - paragraph
+      - generic:
+        - paragraph
+  - generic [ref=e10]:
+    - button "♪" [ref=e11] [cursor=pointer]
+    - button "☼" [ref=e12] [cursor=pointer]
+    - button "✕" [ref=e13] [cursor=pointer]
+  - generic [ref=e16]: trưa · trời sáng
+  - generic:
+    - generic: Hẹn gặp Mẹ ngày mai.
+    - generic: — ngủ ngon, Mẹ —

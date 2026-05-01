@@ -4,3 +4,4 @@ Thumbs.db
 
 # Claude Code local settings
 .claude/
+supabase/.temp/

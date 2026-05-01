@@ -1,0 +1,28 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5] [cursor=pointer]: Mẹ
+    - generic [ref=e8]: gõ cửa vào nhà
+    - generic [ref=e9]: — chạm vào cửa để Mẹ vào
+  - generic:
+    - generic:
+      - generic "về nhà":
+        - img "về nhà"
+      - heading [level=2]
+      - paragraph
+  - generic:
+    - generic:
+      - button "×"
+      - generic:
+        - heading [level=3]
+        - paragraph
+        - paragraph
+      - generic:
+        - paragraph
+  - generic [ref=e10]:
+    - button "♪" [ref=e11] [cursor=pointer]
+    - button "☼" [ref=e12] [cursor=pointer]
+    - button "✕" [ref=e13] [cursor=pointer]
+  - generic [ref=e16]: chiều · trời quang
+  - generic:
+    - generic: Hẹn gặp Mẹ ngày mai.
+    - generic: — ngủ ngon, Mẹ —

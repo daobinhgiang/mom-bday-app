@@ -8,7 +8,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-This is a **single-file static site** (`index.html`) with no build step, no dependencies, and no framework. All HTML, CSS, and JavaScript are inline.
+**Frontend**: A single-file static site (`index.html`) hosted on **GitHub Pages**. No build step, no framework. All HTML, CSS, and JavaScript are inline. Uses vanilla JS + Web Components.
+
+**Backend**: **Supabase** provides four services in one:
+- **Postgres database** — stores book chapters, map pins, journal entries, song dedications, memory jar notes, etc.
+- **Auth** — email/password or magic link login. Each family member has their own account.
+- **Storage** — file hosting for photos, audio, voice memos. Serves all media assets.
+- **Row-Level Security (RLS)** — enforced inside Postgres. Controls who can read/write what (e.g., Mom's journal is private unless she shares it).
+
+There is no separate backend server. The frontend calls Supabase directly via its JS client library.
 
 ### Structure within index.html
 
@@ -16,11 +24,11 @@ This is a **single-file static site** (`index.html`) with no build step, no depe
 - **Door screen** (`#door-screen`): Full-screen overlay, dismissed on click via `openDoor()`
 - **Room navigation** (`#house-nav`): Four clickable cards that show/hide room panels
 - **Room panels** (`#room-library`, `#room-music`, `#room-map`, `#room-family`): Each toggled via `.active` class
-- **JavaScript** (bottom `<script>`): Four functions — `openDoor()`, `showRoom(room)`, `goHome()`, `toggleRecord()`
+- **JavaScript** (bottom `<script>`): Core functions — `openDoor()`, `showRoom(room)`, `goHome()`, `toggleRecord()`, plus Supabase data fetching
 
 ### Room content pattern
 
-Each room panel follows the same structure: back button, h2 title, description paragraph, then room-specific content grid. Content is static placeholder data meant to be replaced with real family memories.
+Each room panel follows the same structure: back button, h2 title, description paragraph, then room-specific content grid. Content is loaded from Supabase (database for structured data, storage for media files).
 
 ## Development
 
@@ -41,3 +49,5 @@ Deploy as a static site. Enable GitHub Pages (Settings > Pages > Source: main br
 - Dark background (#1a1a2e) with gold/warm accent palette
 - Body text color is `black` (set intentionally)
 - All interactivity is CSS class toggling — no external JS libraries
+- Supabase JS client (`@supabase/supabase-js`) is the only external dependency, loaded via CDN
+- All media (photos, audio, voice memos) served from Supabase Storage — no Google Drive
