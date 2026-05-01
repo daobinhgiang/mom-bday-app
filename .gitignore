@@ -1,2 +1,6 @@
 .DS_Store
+Thumbs.db
 *.zip
+
+# Claude Code local settings
+.claude/
