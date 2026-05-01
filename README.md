@@ -116,6 +116,25 @@ Context7 fetches up-to-date library documentation so Claude Code has accurate AP
    ```
 2. Claude Code will automatically use this when you ask about library APIs (e.g. Google Drive API, Web Audio API).
 
+### Setting Up Google Drive (via gcloud CLI)
+
+Google Drive is used for storing app content (images, audio, documents). We use the `gcloud` CLI to sync files locally.
+
+1. Install gcloud CLI:
+   ```bash
+   curl -sSL https://sdk.cloud.google.com | bash -s -- --disable-prompts --install-dir=$HOME
+   source "$HOME/google-cloud-sdk/path.zsh.inc"
+   ```
+2. Authenticate:
+   ```bash
+   gcloud auth login
+   ```
+3. Enable the Drive API in your Google Cloud project:
+   ```bash
+   gcloud services enable drive.googleapis.com
+   ```
+4. Use `gsutil` or the Drive API to sync assets to/from the `images/` folder.
+
 ### Other Useful MCP Servers
 
 | MCP Server | Purpose |
@@ -125,6 +144,7 @@ Context7 fetches up-to-date library documentation so Claude Code has accurate AP
 | **Slack** | Send updates to team channels |
 | **Google Calendar** | Schedule collaboration sessions |
 | **Notion** | Sync project docs and notes |
+| **Google Drive** | Content storage for app assets (community MCP, not official) |
 
 > **Tip**: Run `/help` inside Claude Code to see all available tools and MCP connections.
 

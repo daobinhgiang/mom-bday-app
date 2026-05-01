@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="48" viewBox="0 0 64 48">
+  
+  <defs>
+    <filter id="paint">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" scale="0.9"></feDisplacementMap>
+    </filter>
+  </defs>
+  <g filter="url(#paint)">
+    <path d="M 4 6 L 60 6 L 60 42 L 4 42 Z" fill="#f4ead7" stroke="#5a4530" stroke-width="1.2"></path>
+    <path d="M 4 6 L 32 26 L 60 6" fill="none" stroke="#5a4530" stroke-width="1.2"></path>
+    <line x1="14" y1="32" x2="50" y2="32" stroke="#8a6f50" stroke-width="0.8" opacity="0.5"></line>
+  </g>
+</svg>

@@ -3,327 +3,580 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ngôi Nhà của Mẹ</title>
+<title>Ngôi Nhà Của Mẹ</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><text y='50' font-size='50'>🏠</text></svg>">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Quicksand:wght@400;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Caveat+Brush&family=Kalam:wght@400;700&family=Patrick+Hand&subset=vietnamese&display=swap');
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* =========================================================================
+     DESIGN TOKENS — from Ngôi Nhà Của Mẹ Design System
+     ========================================================================= */
+  :root {
+    /* Surfaces */
+    --paper-cream:        #f4ead7;
+    --paper-cream-warm:   #ecdcb9;
+    --paper-grain:        #e3d2ad;
+    --wall-ochre:         #c9985a;
+    --wall-ochre-deep:    #a87538;
+    --wall-rose:          #d8a98a;
+    --wood-teak:          #8b5a2b;
+    --wood-teak-dark:     #5e3a1a;
+    --wood-teak-light:    #b58860;
+    --wood-rosewood:      #4a2418;
+    --tile-roof:          #a14d2e;
+    --tile-roof-shadow:   #6b3018;
+    --shutter-blue:       #5d7a86;
 
-  body {
-    font-family: 'Quicksand', sans-serif;
-    background: #1a1a2e;
-    color: black;
+    /* Pigments */
+    --lantern-yellow:     #e8b34a;
+    --lantern-glow:       #f4d27a;
+    --lacquer-red:        #9c2a2a;
+    --lacquer-red-deep:   #6e1818;
+    --jade-green:         #5a7a52;
+    --jade-green-deep:    #3a5236;
+    --indigo-blue:        #3a4f6e;
+    --indigo-blue-soft:   #6b7e9a;
+    --peach-blossom:      #e89db0;
+
+    /* Ink */
+    --ink:                #3a2818;
+    --ink-soft:           #5a4530;
+    --ink-faded:          #8a6f50;
+    --ink-ghost:          #b39c7a;
+
+    /* Time of day */
+    --light-sunrise:      #f5c97a;
+    --light-noon:         #fbf2dc;
+    --light-sunset:       #e89c5a;
+    --light-night:        #2b3a52;
+
+    /* Semantic */
+    --bg:                 var(--paper-cream);
+    --fg:                 var(--ink);
+    --fg-soft:            var(--ink-soft);
+    --fg-faded:           var(--ink-faded);
+    --fg-ghost:           var(--ink-ghost);
+    --accent:             var(--lantern-yellow);
+
+    /* Typography */
+    --font-hand:          'Caveat Brush', 'Kalam', 'Patrick Hand', 'Segoe Script', cursive;
+    --font-serif:         'Lora', Georgia, serif;
+
+    /* Spacing */
+    --space-2: 8px; --space-3: 12px; --space-4: 16px;
+    --space-5: 24px; --space-6: 32px; --space-7: 48px;
+
+    /* Corners */
+    --radius-paper: 2px;
+    --radius-soft:  4px;
+
+    /* Shadows */
+    --shadow-paper:   0 1px 2px rgba(58, 40, 24, 0.12);
+    --shadow-object:  0 3px 6px rgba(58, 40, 24, 0.18), 0 1px 2px rgba(58, 40, 24, 0.12);
+    --shadow-room:    0 12px 32px rgba(58, 40, 24, 0.22), 0 4px 8px rgba(58, 40, 24, 0.14);
+    --shadow-lantern: 0 0 24px rgba(232, 179, 74, 0.45), 0 0 8px rgba(244, 210, 122, 0.6);
+
+    /* Easings */
+    --ease-settle: cubic-bezier(0.22, 0.9, 0.32, 1);
+    --ease-door:   cubic-bezier(0.34, 1.2, 0.64, 1);
+    --ease-paper:  cubic-bezier(0.4, 0.0, 0.2, 1);
+    --ease-weight: cubic-bezier(0.5, 0.0, 0.4, 1);
+
+    --dur-quick: 280ms;
+    --dur-base:  480ms;
+    --dur-slow:  720ms;
+    --dur-room:  1100ms;
+  }
+
+  /* =========================================================================
+     BASE
+     ========================================================================= */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #1a1208;
+    min-height: 100vh;
     overflow-x: hidden;
+    font-family: var(--font-serif);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
-  /* ── DOOR REVEAL ── */
-  #door-screen {
-    position: fixed; inset: 0; z-index: 100;
-    background: linear-gradient(135deg, #2d1b0e 0%, #4a2c17 50%, #2d1b0e 100%);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    transition: opacity 1s ease;
-  }
-  #door-screen.hidden { opacity: 0; pointer-events: none; }
-
-  .door-frame {
-    width: 260px; height: 380px;
-    border: 12px solid #8b6914;
-    border-radius: 8px 8px 0 0;
+  /* =========================================================================
+     STAGE — wraps everything, holds time-of-day state
+     ========================================================================= */
+  .stage {
     position: relative;
-    background: #3e2210;
-    box-shadow: 0 0 60px rgba(139,105,20,0.3);
-    cursor: pointer;
-    transition: transform 0.8s ease;
-  }
-  .door-frame:hover { transform: scale(1.02); }
-  .door-frame::before {
-    content: '';
-    position: absolute; right: 30px; top: 50%;
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: #d4a843;
-    box-shadow: 0 0 10px rgba(212,168,67,0.5);
-    transform: translateY(-50%);
-  }
-  .door-frame .peephole {
-    position: absolute; top: 35%; left: 50%;
-    transform: translateX(-50%);
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #ffeaa7 0%, #fdcb6e 100%);
-    box-shadow: 0 0 20px rgba(253,203,110,0.6);
-  }
-
-  .door-text {
-    margin-top: 40px;
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    color: #d4a843;
-    text-align: center;
-    animation: pulse 2s ease-in-out infinite;
-  }
-  .door-subtitle {
-    margin-top: 12px;
-    font-size: 0.95rem;
-    color: #b8956a;
-    letter-spacing: 1px;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 1; }
-  }
-
-  /* ── MAIN APP ── */
-  #app { display: none; }
-  #app.visible { display: block; animation: fadeUp 1s ease; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  header {
-    text-align: center;
-    padding: 50px 20px 30px;
-    background: linear-gradient(180deg, #16213e 0%, #1a1a2e 100%);
-  }
-  header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.8rem;
-    color: #ffeaa7;
-    margin-bottom: 8px;
-  }
-  header p {
-    color: #b8956a;
-    font-size: 1.1rem;
-    letter-spacing: 2px;
-  }
-
-  /* ── HOUSE ILLUSTRATION ── */
-  .house-nav {
-    display: flex; flex-wrap: wrap;
-    justify-content: center; gap: 20px;
-    padding: 30px 20px;
-    max-width: 900px; margin: 0 auto;
-  }
-
-  .room-card {
-    width: 190px;
-    background: linear-gradient(145deg, #16213e, #0f3460);
-    border: 2px solid #1a3a6a;
-    border-radius: 16px;
-    padding: 30px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
+    width: 100vw;
+    min-height: 100vh;
+    background: var(--paper-cream);
     overflow: hidden;
-  }
-  .room-card:hover {
-    transform: translateY(-6px);
-    border-color: #ffeaa7;
-    box-shadow: 0 12px 40px rgba(255,234,167,0.15);
-  }
-  .room-card .icon {
-    font-size: 3rem;
-    margin-bottom: 12px;
-    display: block;
-  }
-  .room-card h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.15rem;
-    color: #ffeaa7;
-    margin-bottom: 6px;
-  }
-  .room-card p {
-    font-size: 0.8rem;
-    color: #7f8fa6;
-    line-height: 1.4;
+    transition: background var(--dur-slow) var(--ease-settle);
   }
 
-  /* ── ROOM PANELS ── */
-  .room-panel {
-    display: none;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 30px 20px 60px;
-    animation: fadeUp 0.6s ease;
+  /* Time-of-day light overlay */
+  .light-overlay {
+    position: fixed; inset: 0; pointer-events: none; z-index: 50;
+    mix-blend-mode: multiply;
+    transition: background var(--dur-slow) var(--ease-settle), opacity var(--dur-slow) var(--ease-settle);
   }
-  .room-panel.active { display: block; }
+  .stage[data-tod="sunrise"] .light-overlay { background: #f5c97a; opacity: 0.30; }
+  .stage[data-tod="noon"]    .light-overlay { background: #fbf2dc; opacity: 0.18; }
+  .stage[data-tod="sunset"]  .light-overlay { background: #e89c5a; opacity: 0.42; }
+  .stage[data-tod="night"]   .light-overlay { background: #2b3a52; opacity: 0.55; }
 
-  .back-btn {
-    background: none; border: 1px solid #4a4a6a;
-    color: #b8956a; padding: 8px 20px;
-    border-radius: 20px; cursor: pointer;
-    font-family: 'Quicksand', sans-serif;
-    font-size: 0.9rem;
-    margin-bottom: 24px;
-    transition: all 0.2s;
-  }
-  .back-btn:hover { border-color: #ffeaa7; color: #ffeaa7; }
-
-  .room-panel h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    color: #ffeaa7;
-    margin-bottom: 8px;
-  }
-  .room-panel .room-desc {
-    color: #7f8fa6;
-    margin-bottom: 28px;
-    line-height: 1.6;
+  /* Paper grain overlay */
+  .grain-overlay {
+    position: fixed; inset: 0; pointer-events: none; z-index: 51;
+    background-image: url('assets/textures/paper-grain.svg');
+    background-size: 400px 400px;
+    opacity: 0.4;
+    mix-blend-mode: multiply;
   }
 
-  /* ── LIBRARY ── */
-  .bookshelf {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 16px;
+  /* =========================================================================
+     DOOR SCREEN
+     ========================================================================= */
+  .door-screen {
+    position: fixed; inset: 0; z-index: 100;
+    background: radial-gradient(ellipse at center, #5e3a1a 0%, #2a1810 80%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+    transition: opacity var(--dur-slow) var(--ease-settle);
+  }
+  .door-screen.gone { opacity: 0; pointer-events: none; }
+
+  .door {
+    width: 260px; height: 460px;
+    background: linear-gradient(135deg, #5e3a1a, #3a2010);
+    border: 6px solid #2a1810;
+    border-radius: 6px 6px 0 0;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.6), inset 0 0 40px rgba(0,0,0,0.3);
+    transition: transform var(--dur-slow) var(--ease-door);
+    transform-origin: left center;
+  }
+  .door:hover { transform: scale(1.02); }
+  .door.opening { transform: perspective(900px) rotateY(-72deg); }
+  .door::before {
+    content: ''; position: absolute; right: 20px; top: 52%;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--lantern-yellow);
+    box-shadow: 0 0 16px var(--lantern-glow), 0 0 4px #fff;
+  }
+  .door .panel {
+    position: absolute; left: 22px; right: 22px;
+    border: 1px solid rgba(244,234,215,0.08);
+    box-shadow: inset 0 0 16px rgba(0,0,0,0.5);
+  }
+  .door .panel.top { top: 30px; height: 40%; }
+  .door .panel.bot { bottom: 30px; height: 40%; }
+  .door .nameplate {
+    position: absolute; top: 18px; left: 50%; transform: translateX(-50%);
+    font-family: var(--font-hand); font-size: 18px; color: var(--lantern-glow);
+    background: rgba(0,0,0,0.3); padding: 2px 14px; border-radius: 2px;
+  }
+
+  .door-label { font-family: var(--font-hand); font-size: 32px; color: var(--lantern-glow); text-align: center; }
+  .door-sub   { font-family: var(--font-serif); font-style: italic; font-size: 14px; color: rgba(244,234,215,0.55); }
+
+  /* Moth animation on door screen */
+  .moth {
+    position: absolute; width: 14px; height: 14px;
+    color: var(--paper-cream); opacity: 0.5;
+    animation: moth 6s ease-in-out infinite;
+  }
+  @keyframes moth {
+    0%,100% { transform: translate(60vw, 30vh) rotate(0); }
+    25%     { transform: translate(45vw, 50vh) rotate(20deg); }
+    50%     { transform: translate(70vw, 60vh) rotate(-15deg); }
+    75%     { transform: translate(55vw, 40vh) rotate(10deg); }
+  }
+
+  /* =========================================================================
+     HUB (HOUSE CROSS-SECTION)
+     ========================================================================= */
+  #hub { position: relative; min-height: 100vh; padding: 32px 24px 80px; }
+  #hub.hide { display: none; }
+
+  .hub-header { text-align: center; margin-bottom: 18px; position: relative; z-index: 2; }
+  .hub-header h1 {
+    font-family: var(--font-hand); font-size: 56px; color: var(--ink);
+    margin: 0; line-height: 1;
+  }
+  .hub-header .greeting {
+    font-family: var(--font-serif); font-style: italic; font-size: 16px;
+    color: var(--ink-soft); margin-top: 4px;
+  }
+
+  .house {
+    max-width: 1100px; margin: 0 auto; position: relative;
+    aspect-ratio: 1200 / 700;
+  }
+  .house-bg {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none;
+  }
+
+  /* Clickable room hot zones */
+  .room-hot {
+    position: absolute;
+    cursor: pointer;
+    border-radius: var(--radius-soft);
+    transition: background var(--dur-base) var(--ease-settle), transform var(--dur-base) var(--ease-settle);
+    background: rgba(244,210,122,0);
+  }
+  .room-hot:hover { background: rgba(244,210,122,0.18); transform: scale(1.01); }
+  .room-hot:hover .room-tag { opacity: 1; transform: translate(-50%, 0); }
+
+  .room-tag {
+    position: absolute; bottom: -22px; left: 50%; transform: translate(-50%, 4px);
+    font-family: var(--font-hand); font-size: 18px; color: var(--ink);
+    background: var(--paper-cream); padding: 1px 10px; border-radius: 2px;
+    box-shadow: var(--shadow-paper);
+    opacity: 0; transition: opacity var(--dur-base) var(--ease-settle), transform var(--dur-base) var(--ease-settle);
+    white-space: nowrap; pointer-events: none;
+  }
+
+  .room-lantern {
+    position: absolute; top: -8px; right: 8px; width: 20px; height: 30px;
+    pointer-events: none;
+  }
+  .room-lantern img {
+    width: 100%; height: 100%;
+    filter: drop-shadow(0 0 10px #f4d27a) drop-shadow(0 0 20px rgba(232,179,74,0.5));
+    animation: flicker 5.4s ease-in-out infinite;
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    43% { opacity: 0.88; }
+    47% { opacity: 0.98; }
+    72% { opacity: 0.92; }
+  }
+
+  /* =========================================================================
+     TOOLBAR — top-right corner
+     ========================================================================= */
+  .toolbar {
+    position: fixed; top: 18px; right: 18px; z-index: 60;
+    display: flex; gap: 10px; align-items: center;
+  }
+  .toolbar button {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--paper-cream-warm);
+    border: 1px solid rgba(58,40,24,0.2);
+    box-shadow: var(--shadow-paper);
+    font-family: var(--font-serif); font-size: 16px; color: var(--ink);
+    cursor: pointer;
+    transition: transform var(--dur-quick) var(--ease-settle);
+  }
+  .toolbar button:hover { transform: translateY(-1px); }
+  .toolbar button:active { transform: translateY(1px) scale(0.97); }
+
+  /* Ambient pill — bottom-left */
+  .ambient-pill {
+    position: fixed; bottom: 18px; left: 18px; z-index: 60;
+    background: var(--paper-cream-warm);
+    border: 1px solid rgba(58,40,24,0.18);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-family: var(--font-serif); font-style: italic; font-size: 13px;
+    color: var(--ink-soft);
+    box-shadow: var(--shadow-paper);
+    display: flex; gap: 8px; align-items: center;
+  }
+  .ambient-pill .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--lantern-yellow);
+    box-shadow: 0 0 8px var(--lantern-glow);
+  }
+
+  /* =========================================================================
+     ROOM VIEW — full-screen room panel
+     ========================================================================= */
+  #room-view {
+    position: fixed; inset: 0; z-index: 40;
+    background: var(--wall-ochre);
+    overflow-y: auto;
+    opacity: 0; pointer-events: none;
+    transition: opacity var(--dur-slow) var(--ease-settle);
+  }
+  #room-view.show { opacity: 1; pointer-events: auto; }
+
+  .room-inner {
+    max-width: 880px; margin: 0 auto; padding: 28px 32px 80px;
+    min-height: 100vh;
+    background: var(--wall-ochre);
+    background-image:
+      radial-gradient(ellipse at 50% 0%, rgba(244,210,122,0.18), transparent 70%),
+      radial-gradient(ellipse at 50% 100%, rgba(58,40,24,0.22), transparent 70%);
+    position: relative;
+  }
+
+  /* House icon in top-left = return to hub */
+  .home-frame {
+    position: absolute; top: 22px; left: 24px;
+    width: 56px; height: 56px;
+    background: var(--wood-teak-dark);
+    padding: 6px;
+    border-radius: 3px;
+    box-shadow: var(--shadow-object);
+    cursor: pointer;
+    transition: transform var(--dur-base) var(--ease-settle);
+  }
+  .home-frame:hover { transform: rotate(-2deg) scale(1.04); }
+  .home-frame img {
+    width: 100%; height: 100%; display: block;
+    background: var(--paper-cream); border-radius: 2px;
+    padding: 2px; box-sizing: border-box;
+  }
+
+  .room-title {
+    font-family: var(--font-hand); font-size: 64px;
+    color: var(--paper-cream); text-align: center;
+    margin: 6px 0 4px; line-height: 1;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  }
+  .room-desc {
+    font-family: var(--font-serif); font-style: italic; font-size: 16px;
+    color: rgba(244,234,215,0.85); text-align: center; margin: 0 0 36px;
+  }
+
+  /* =========================================================================
+     LIBRARY — Bookshelf
+     ========================================================================= */
+  .shelf {
+    background: var(--wood-teak-dark);
+    padding: 22px 18px 10px;
+    border-radius: 4px;
+    box-shadow: var(--shadow-room);
+    margin-bottom: 22px;
+  }
+  .shelf-row {
+    display: flex; gap: 8px; align-items: flex-end;
+    perspective: 600px;
+    flex-wrap: wrap;
   }
   .book {
-    background: linear-gradient(135deg, #6c3a0a, #8b4513);
-    border-radius: 4px 8px 8px 4px;
-    padding: 20px 14px;
-    min-height: 180px;
-    display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-    text-align: center;
+    width: 56px; height: 180px;
+    padding: 12px 6px; border-radius: 1px 3px 3px 1px;
+    color: var(--paper-cream);
+    font-family: var(--font-hand); font-size: 16px; line-height: 1.1; text-align: center;
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    box-shadow: inset -4px 0 8px rgba(0,0,0,0.35), inset 3px 0 4px rgba(255,255,255,0.06);
     cursor: pointer;
-    transition: all 0.3s;
-    border-left: 6px solid;
+    transition: transform var(--dur-slow) var(--ease-weight);
+    flex-shrink: 0;
+    border-left: 3px solid rgba(0,0,0,0.4);
     position: relative;
   }
-  .book:nth-child(1) { border-left-color: #e17055; }
-  .book:nth-child(2) { border-left-color: #00b894; }
-  .book:nth-child(3) { border-left-color: #0984e3; }
-  .book:nth-child(4) { border-left-color: #fdcb6e; }
-  .book:hover { transform: scale(1.05) rotate(-1deg); }
-  .book h4 { font-size: 0.95rem; color: #ffeaa7; margin-bottom: 8px; }
-  .book p { font-size: 0.75rem; color: #dfe6e9; line-height: 1.4; }
+  .book:hover { transform: rotate(180deg) translateY(-12px); }
+  .book.has-new::after {
+    content: ''; position: absolute; top: -10px; left: 50%; transform: translate(-50%, 0) rotate(180deg);
+    width: 14px; height: 22px; background: var(--lacquer-red);
+    box-shadow: var(--shadow-paper);
+  }
+  .plank {
+    height: 10px; background: var(--wood-teak);
+    border-radius: 0 0 3px 3px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+  }
 
-  /* ── MUSIC ROOM ── */
-  .record-player {
-    width: 200px; height: 200px;
-    margin: 0 auto 30px;
-    background: radial-gradient(circle, #2d2d2d 30%, #1a1a1a 70%);
-    border-radius: 50%;
-    border: 4px solid #4a4a4a;
+  /* Book spread modal */
+  .book-open {
+    position: fixed; inset: 0; z-index: 70;
     display: flex; align-items: center; justify-content: center;
+    background: rgba(26,18,8,0.65);
+    opacity: 0; pointer-events: none;
+    transition: opacity var(--dur-slow) var(--ease-settle);
+    backdrop-filter: blur(2px);
+  }
+  .book-open.show { opacity: 1; pointer-events: auto; }
+  .book-spread {
+    width: 720px; max-width: 92vw; min-height: 460px;
+    background: #faf2dc;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    display: grid; grid-template-columns: 1fr 1fr;
+    position: relative;
+    border-radius: 2px;
+  }
+  .book-spread::before {
+    content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(to right, transparent, rgba(58,40,24,0.18), transparent);
+    transform: translateX(-50%);
+  }
+  .page { padding: 36px 38px; }
+  .page h3 { font-family: var(--font-hand); font-size: 32px; color: var(--ink); margin: 0 0 16px; }
+  .page p  { font-family: var(--font-hand); font-size: 22px; color: var(--ink); line-height: 1.4; margin: 0 0 12px; }
+  .page .meta { font-family: var(--font-serif); font-style: italic; font-size: 12px; color: var(--ink-faded); }
+  .page-close {
+    position: absolute; top: 12px; right: 14px;
+    background: none; border: none;
+    font-family: var(--font-serif); font-size: 22px; color: var(--ink-soft);
+    cursor: pointer;
+  }
+
+  /* =========================================================================
+     MUSIC ROOM — Turntable + Songs
+     ========================================================================= */
+  .music-layout { display: grid; grid-template-columns: 320px 1fr; gap: 32px; align-items: flex-start; }
+  @media (max-width: 760px) { .music-layout { grid-template-columns: 1fr; } }
+
+  .turntable {
+    background: var(--wood-teak-dark);
+    padding: 22px;
+    border-radius: 4px;
+    box-shadow: var(--shadow-room);
     position: relative;
   }
-  .record-player.spinning { animation: spin 3s linear infinite; }
-  .record-player .center {
-    width: 30px; height: 30px;
-    background: #ffeaa7;
-    border-radius: 50%;
+  .platter {
+    width: 100%; aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle, #1a0e08 18%, #2a1810 22%, #1a0e08 32%, #2a1810 36%, #1a0e08 50%, #2a1810 54%, #1a0e08 70%);
+    position: relative;
+    box-shadow: inset 0 0 32px rgba(0,0,0,0.6);
+    transition: transform 1.6s var(--ease-weight);
+  }
+  .platter.spinning { animation: spin 3.4s linear infinite; }
+  .platter::before {
+    content: ''; position: absolute; inset: 38%; border-radius: 50%;
+    background: var(--lacquer-red); border: 2px solid #6e1818;
+  }
+  .platter::after {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%); width: 10px; height: 10px;
+    border-radius: 50%; background: var(--lantern-yellow);
+  }
+  .arm {
+    position: absolute; top: 30px; right: 30px;
+    width: 40%; height: 5px; background: var(--paper-cream);
+    transform-origin: right center; transform: rotate(-30deg);
+    border-radius: 2px;
+    transition: transform var(--dur-slow) var(--ease-weight);
+  }
+  .arm.playing { transform: rotate(-12deg); }
+  .arm::before {
+    content: ''; position: absolute; left: -10px; top: -8px;
+    width: 20px; height: 20px; background: var(--lantern-yellow);
+    border-radius: 50%; box-shadow: var(--shadow-object);
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .song-list { list-style: none; }
-  .song-list li {
-    background: rgba(255,255,255,0.05);
-    padding: 16px 20px;
-    border-radius: 10px;
-    margin-bottom: 10px;
+  .songs { display: flex; flex-direction: column; gap: 10px; }
+  .song {
+    background: rgba(244,234,215,0.15);
+    border: 1px solid rgba(244,234,215,0.2);
+    padding: 12px 16px;
     cursor: pointer;
-    transition: all 0.2s;
-    display: flex; align-items: center; gap: 14px;
+    display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: center;
+    transition: background var(--dur-base) var(--ease-settle), transform var(--dur-base) var(--ease-settle);
+    border-radius: 2px;
   }
-  .song-list li:hover { background: rgba(255,234,167,0.1); }
-  .song-list .play-icon {
-    width: 36px; height: 36px;
-    background: #ffeaa7;
-    border-radius: 50%;
+  .song:hover { background: rgba(244,234,215,0.25); transform: translateX(2px); }
+  .song.playing { background: rgba(244,210,122,0.25); border-color: var(--lantern-yellow); }
+  .song .play {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--lantern-yellow); color: var(--ink);
     display: flex; align-items: center; justify-content: center;
-    color: #1a1a2e;
-    font-size: 0.9rem;
-    flex-shrink: 0;
+    font-family: var(--font-serif);
   }
-  .song-list .song-info h4 { color: #f5f0e8; font-size: 0.95rem; }
-  .song-list .song-info p { color: #7f8fa6; font-size: 0.8rem; margin-top: 2px; }
+  .song h4 { font-family: var(--font-serif); font-size: 16px; color: var(--paper-cream); margin: 0 0 2px; }
+  .song .ded { font-family: var(--font-hand); font-size: 16px; color: rgba(244,234,215,0.78); }
 
-  /* ── MAP ROOM ── */
-  .map-container {
-    background: linear-gradient(145deg, #1b3a4b, #16213e);
-    border-radius: 16px;
-    padding: 30px;
-    position: relative;
-    min-height: 350px;
+  /* =========================================================================
+     MAP ROOM
+     ========================================================================= */
+  .map {
+    background: #ecdcb9;
+    background-image:
+      radial-gradient(ellipse at 30% 30%, rgba(168,117,56,0.12), transparent 60%),
+      radial-gradient(ellipse at 70% 70%, rgba(58,40,24,0.1), transparent 60%);
+    border: 1px solid rgba(58,40,24,0.18);
+    padding: 24px 28px;
+    box-shadow: var(--shadow-object);
+    border-radius: 2px;
   }
-  .map-pin {
-    display: inline-flex;
-    align-items: center; gap: 8px;
-    background: rgba(255,255,255,0.08);
-    padding: 10px 16px;
-    border-radius: 20px;
-    margin: 6px;
-    font-size: 0.85rem;
-    transition: all 0.2s;
+  .map-legend { display: flex; gap: 18px; margin-bottom: 14px; flex-wrap: wrap; }
+  .leg { display: flex; gap: 6px; align-items: center; font-family: var(--font-serif); font-style: italic; font-size: 12px; color: var(--ink-soft); }
+  .leg .d { width: 10px; height: 10px; border-radius: 50%; }
+  .pins { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pin {
+    background: var(--paper-cream); border: 1px solid rgba(58,40,24,0.2);
+    padding: 6px 12px 6px 8px; border-radius: 999px;
+    font-family: var(--font-hand); font-size: 18px; color: var(--ink);
+    display: flex; gap: 8px; align-items: center;
+    box-shadow: var(--shadow-paper);
+    transition: transform var(--dur-base) var(--ease-settle);
     cursor: default;
   }
-  .map-pin:hover {
-    background: rgba(255,234,167,0.15);
-    transform: scale(1.05);
-  }
-  .map-pin .pin-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .pin-lived .pin-dot { background: #e17055; }
-  .pin-visited .pin-dot { background: #00b894; }
-  .pin-dream .pin-dot { background: #a29bfe; }
+  .pin:hover { transform: rotate(-1deg) scale(1.03); }
+  .pin .d { width: 10px; height: 10px; border-radius: 50%; }
 
-  .map-legend {
-    display: flex; gap: 20px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
+  /* =========================================================================
+     FAMILY ROOM — Photo Wall
+     ========================================================================= */
+  .photo-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px; }
+  .frame {
+    background: var(--wood-teak-dark);
+    padding: 12px 12px 26px;
+    box-shadow: var(--shadow-object);
+    transition: transform var(--dur-slow) var(--ease-settle);
+    cursor: pointer;
   }
-  .map-legend span {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 0.8rem; color: #7f8fa6;
+  .frame:nth-child(2n) { transform: rotate(-2deg); background: var(--wood-teak); }
+  .frame:nth-child(3n) { transform: rotate(1.4deg); background: var(--wood-rosewood); }
+  .frame:hover { transform: rotate(-3deg) scale(1.03); }
+  .frame .photo {
+    aspect-ratio: 4/3;
+    background: linear-gradient(160deg, #b58860, #5e3a1a);
+    border: 1px solid rgba(0,0,0,0.4);
   }
-  .map-legend .dot {
-    width: 8px; height: 8px; border-radius: 50%;
+  .frame .photo.p2 { background: linear-gradient(160deg, #d8a98a, #8b5a2b); }
+  .frame .photo.p3 { background: linear-gradient(160deg, #c9985a, #5e3a1a); }
+  .frame .photo.p4 { background: linear-gradient(160deg, #5a7a52, #3a5236); }
+  .frame .photo.p5 { background: linear-gradient(160deg, #e89db0, #9c2a2a); }
+  .frame .photo.p6 { background: linear-gradient(160deg, #8aa3b5, #3a4f6e); }
+  .frame .cap { font-family: var(--font-hand); font-size: 18px; color: var(--paper-cream); text-align: center; margin-top: 8px; }
+  .frame .author { font-family: var(--font-serif); font-style: italic; font-size: 11px; color: rgba(244,234,215,0.6); text-align: center; margin-top: 2px; }
+
+  /* =========================================================================
+     BEDROOM — Room Illustration
+     ========================================================================= */
+  .bedroom-scene {
+    max-width: 680px;
+    margin: 0 auto;
+    border-radius: var(--radius-soft);
+    box-shadow: var(--shadow-room);
+    overflow: hidden;
+  }
+  .bedroom-scene img {
+    width: 100%; height: auto; display: block;
+    image-rendering: pixelated;
   }
 
-  /* ── FAMILY ROOM ── */
-  .photo-wall {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 16px;
+  /* =========================================================================
+     FAREWELL SCREEN
+     ========================================================================= */
+  .farewell-screen {
+    position: fixed; inset: 0; z-index: 80;
+    background: radial-gradient(ellipse at 50% 65%, rgba(232,179,74,0.18), rgba(43,58,82,0.95) 60%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 1200ms var(--ease-settle);
   }
-  .photo-frame {
-    background: linear-gradient(145deg, #2d2416, #3e3222);
-    border: 3px solid #5a4a2f;
-    border-radius: 8px;
-    padding: 12px;
-    text-align: center;
-    transition: all 0.3s;
+  .farewell-screen.show { opacity: 1; pointer-events: auto; }
+  .farewell-screen .lan {
+    width: 60px; height: 90px;
+    filter: drop-shadow(0 0 24px var(--lantern-glow)) drop-shadow(0 0 50px rgba(232,179,74,0.6));
+    animation: flicker 5.4s ease-in-out infinite;
   }
-  .photo-frame:hover {
-    transform: rotate(-2deg) scale(1.03);
-    border-color: #ffeaa7;
+  .farewell-screen .text {
+    font-family: var(--font-serif); font-style: italic; font-size: 32px;
+    color: var(--lantern-glow); letter-spacing: 0.04em;
   }
-  .photo-placeholder {
-    width: 100%; height: 140px;
-    background: linear-gradient(135deg, #4a3f2f, #5a4a3a);
-    border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-  }
-  .photo-frame p {
-    font-size: 0.85rem;
-    color: #b8956a;
-    line-height: 1.4;
-  }
-  .photo-frame .author {
-    font-size: 0.75rem;
-    color: #7f8fa6;
-    margin-top: 4px;
+  .farewell-screen .sub {
+    font-family: var(--font-hand); font-size: 22px;
+    color: rgba(244,234,215,0.6);
   }
   .photo-frame img {
     width: 100%; height: 140px;
@@ -341,191 +594,299 @@
     font-size: 0.95rem;
   }
 
-  /* ── FOOTER ── */
-  footer {
-    text-align: center;
-    padding: 40px 20px;
-    color: #4a4a6a;
-    font-size: 0.85rem;
-  }
-
-  /* ── RESPONSIVE ── */
+  /* =========================================================================
+     RESPONSIVE
+     ========================================================================= */
   @media (max-width: 600px) {
-    header h1 { font-size: 2rem; }
-    .room-card { width: 160px; padding: 20px 14px; }
-    .room-card .icon { font-size: 2.2rem; }
-    .door-frame { width: 200px; height: 300px; }
-    .door-text { font-size: 1.2rem; }
+    .hub-header h1 { font-size: 38px; }
+    .room-title { font-size: 42px; }
+    .door { width: 200px; height: 360px; }
+    .door-label { font-size: 24px; }
+    .book-spread { grid-template-columns: 1fr; min-height: auto; }
+    .book-spread::before { display: none; }
+    .shelf-row { justify-content: center; }
+    .photo-wall { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+    .room-inner { padding: 20px 16px 60px; }
+    .home-frame { top: 14px; left: 14px; width: 44px; height: 44px; }
   }
 </style>
 </head>
 <body>
 
-<!-- DOOR REVEAL -->
-<div id="door-screen" onclick="openDoor()">
-  <div class="door-frame">
-    <div class="peephole"></div>
-  </div>
-  <div class="door-text">Gõ vào nhà Mẹ</div>
-  <div class="door-subtitle">nhấn để mở cửa</div>
-</div>
+<div class="stage" id="stage" data-tod="noon">
 
-<!-- MAIN APP -->
-<div id="app">
-  <header>
-    <h1>Ngôi Nhà của Mẹ</h1>
-    <p>Một ngôi nhà đầy kỷ niệm</p>
-  </header>
-
-  <!-- ROOM NAVIGATION -->
-  <div class="house-nav" id="house-nav">
-    <div class="room-card" onclick="showRoom('library')">
-      <span class="icon">&#128218;</span>
-      <h3>Thư Viện</h3>
-      <p>Kỷ niệm từ gia đình</p>
+  <!-- DOOR -->
+  <div class="door-screen" id="doorScreen">
+    <div class="door" id="door" onclick="openDoor()">
+      <div class="nameplate">Mẹ</div>
+      <div class="panel top"></div>
+      <div class="panel bot"></div>
     </div>
-    <div class="room-card" onclick="showRoom('music')">
-      <span class="icon">&#127926;</span>
-      <h3>Phòng Nhạc</h3>
-      <p>Những bài hát dành cho Mẹ</p>
-    </div>
-    <div class="room-card" onclick="showRoom('map')">
-      <span class="icon">&#127758;</span>
-      <h3>Phòng Bản Đồ</h3>
-      <p>Những nơi Mẹ đã đến</p>
-    </div>
-    <div class="room-card" onclick="showRoom('family')">
-      <span class="icon">&#128248;</span>
-      <h3>Phòng Gia Đình</h3>
-      <p>Ảnh và hình vẽ của cháu</p>
-    </div>
+    <div class="door-label">gõ cửa vào nhà</div>
+    <div class="door-sub">— chạm vào cửa để Mẹ vào</div>
   </div>
 
-  <!-- LIBRARY -->
-  <div class="room-panel" id="room-library">
-    <button class="back-btn" onclick="goHome()">&larr; Về nhà</button>
-    <h2>Thư Viện</h2>
-    <p class="room-desc">Mỗi cuốn sách là một bộ sưu tập kỷ niệm từ một người trong gia đình.</p>
-    <div class="bookshelf">
-      <div class="book">
-        <h4>Cuốn sách của Con Trai</h4>
-        <p>"Mẹ ơi, con nhớ ngày Mẹ đưa con đi học ngày đầu tiên..."</p>
+  <!-- HUB -->
+  <div id="hub" class="hide">
+    <div class="hub-header">
+      <h1>Ngôi Nhà Của Mẹ</h1>
+      <div class="greeting" id="greeting">— buổi trưa, trời sáng —</div>
+    </div>
+
+    <div class="house">
+      <img src="assets/house-cross-section.svg" class="house-bg" alt=""/>
+
+      <!-- Hot zones positioned over the cross-section SVG -->
+      <div class="room-hot" style="left: 10%; top: 31%; width: 20%; height: 30%" onclick="enterRoom('library')">
+        <div class="room-tag">Thư Viện</div>
+        <div class="room-lantern"><img src="assets/lantern.svg" alt=""/></div>
       </div>
-      <div class="book">
-        <h4>Cuốn sách của Con Gái</h4>
-        <p>"Mẹ luôn là người đầu tiên con gọi khi con cần lời khuyên..."</p>
+      <div class="room-hot" style="left: 30%; top: 31%; width: 20%; height: 30%" onclick="enterRoom('music')">
+        <div class="room-tag">Phòng Nhạc</div>
       </div>
-      <div class="book">
-        <h4>Cuốn sách của Cháu</h4>
-        <p>"Bà ngoại nấu ăn ngon nhất thế giới!"</p>
+      <div class="room-hot" style="left: 50%; top: 31%; width: 20%; height: 30%" onclick="enterRoom('map')">
+        <div class="room-tag">Phòng Bản Đồ</div>
       </div>
-      <div class="book">
-        <h4>Cuốn sách của Gia Đình</h4>
-        <p>"Những bữa cơm chiều cuối tuần cùng nhau..."</p>
+      <div class="room-hot" style="left: 70%; top: 31%; width: 20%; height: 30%" onclick="enterRoom('family')">
+        <div class="room-tag">Phòng Gia Đình</div>
+        <div class="room-lantern"><img src="assets/lantern.svg" alt=""/></div>
+      </div>
+      <div class="room-hot" style="left: 10%; top: 61%; width: 30%; height: 30%" onclick="enterRoom('bedroom')">
+        <div class="room-tag">Phòng Ngủ</div>
+      </div>
+      <div class="room-hot" style="left: 65%; top: 61%; width: 25%; height: 30%" onclick="enterRoom('garden')">
+        <div class="room-tag">Vườn</div>
       </div>
     </div>
   </div>
 
-  <!-- MUSIC ROOM -->
-  <div class="room-panel" id="room-music">
-    <button class="back-btn" onclick="goHome()">&larr; Về nhà</button>
-    <h2>Phòng Nhạc</h2>
-    <p class="room-desc">Những bài hát mà mọi người liên tưởng đến Mẹ, kèm lời nhắn yêu thương.</p>
-    <div class="record-player" id="record">
-      <div class="center"></div>
+  <!-- ROOM VIEW -->
+  <div id="room-view">
+    <div class="room-inner">
+      <div class="home-frame" onclick="goHome()" title="về nhà">
+        <img src="assets/house-glyph.svg" alt="về nhà"/>
+      </div>
+      <h2 class="room-title" id="roomTitle"></h2>
+      <p class="room-desc" id="roomDesc"></p>
+      <div id="roomBody"></div>
     </div>
-    <ul class="song-list">
-      <li onclick="toggleRecord()">
-        <div class="play-icon">&#9654;</div>
-        <div class="song-info">
-          <h4>Bông Hồng Cài Áo</h4>
-          <p>"Bài hát này làm con nhớ Mẹ mỗi khi nghe" &mdash; Con Trai</p>
-        </div>
-      </li>
-      <li onclick="toggleRecord()">
-        <div class="play-icon">&#9654;</div>
-        <div class="song-info">
-          <h4>Mẹ Tôi</h4>
-          <p>"Mẹ hay hát bài này ru con ngủ" &mdash; Con Gái</p>
-        </div>
-      </li>
-      <li onclick="toggleRecord()">
-        <div class="play-icon">&#9654;</div>
-        <div class="song-info">
-          <h4>Diễm Xưa - Khánh Ly</h4>
-          <p>"Bài hát Mẹ nghe nhiều nhất" &mdash; Gia Đình</p>
-        </div>
-      </li>
-    </ul>
   </div>
 
-  <!-- MAP ROOM -->
-  <div class="room-panel" id="room-map">
-    <button class="back-btn" onclick="goHome()">&larr; Về nhà</button>
-    <h2>Phòng Bản Đồ</h2>
-    <p class="room-desc">Những nơi Mẹ đã sống, đã ghé thăm, và những nơi Mẹ ước mơ sẽ đến.</p>
-    <div class="map-container">
-      <div class="map-legend">
-        <span><span class="dot" style="background:#e17055"></span> Đã sống</span>
-        <span><span class="dot" style="background:#00b894"></span> Đã ghé thăm</span>
-        <span><span class="dot" style="background:#a29bfe"></span> Ước mơ</span>
+  <!-- BOOK SPREAD MODAL -->
+  <div class="book-open" id="bookOpen" onclick="if(event.target.id==='bookOpen')closeBook()">
+    <div class="book-spread">
+      <button class="page-close" onclick="closeBook()">×</button>
+      <div class="page">
+        <h3 id="bookTitle"></h3>
+        <p id="bookBody1"></p>
+        <p class="meta" id="bookMeta"></p>
       </div>
-      <div>
-        <span class="map-pin pin-lived"><span class="pin-dot"></span>Sài Gòn</span>
-        <span class="map-pin pin-lived"><span class="pin-dot"></span>Hà Nội</span>
-        <span class="map-pin pin-lived"><span class="pin-dot"></span>Huế</span>
-        <span class="map-pin pin-visited"><span class="pin-dot"></span>Đà Lạt</span>
-        <span class="map-pin pin-visited"><span class="pin-dot"></span>Nha Trang</span>
-        <span class="map-pin pin-visited"><span class="pin-dot"></span>Hội An</span>
-        <span class="map-pin pin-visited"><span class="pin-dot"></span>Phú Quốc</span>
-        <span class="map-pin pin-dream"><span class="pin-dot"></span>Paris</span>
-        <span class="map-pin pin-dream"><span class="pin-dot"></span>Tokyo</span>
-        <span class="map-pin pin-dream"><span class="pin-dot"></span>Hạ Long</span>
+      <div class="page">
+        <p id="bookBody2"></p>
       </div>
     </div>
   </div>
 
-  <!-- FAMILY ROOM -->
-  <div class="room-panel" id="room-family">
-    <button class="back-btn" onclick="goHome()">&larr; Về nhà</button>
-    <h2>Phòng Gia Đình</h2>
-    <p class="room-desc">Bức tường đầy ảnh và hình vẽ của các cháu.</p>
-    <div class="photo-wall" id="photo-wall">
-      <div class="photo-status">Đang tải ảnh...</div>
-    </div>
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <button id="muteBtn" title="tắt âm" onclick="toggleMute()">&#9834;</button>
+    <button id="todBtn" title="đổi giờ trong ngày" onclick="cycleTOD()">&#9788;</button>
+    <button title="đóng cửa, hẹn ngày mai" onclick="farewell()">&#10005;</button>
   </div>
 
-  <footer>
-    <p>Xây với tình yêu dành cho Mẹ</p>
-  </footer>
+  <!-- AMBIENT PILL -->
+  <div class="ambient-pill"><div class="dot"></div><span id="ambientLabel">trưa · trời sáng</span></div>
+
+  <!-- OVERLAYS -->
+  <div class="light-overlay"></div>
+  <div class="grain-overlay"></div>
+
+  <!-- FAREWELL -->
+  <div class="farewell-screen" id="farewell">
+    <img src="assets/lantern.svg" class="lan" alt=""/>
+    <div class="text">Hẹn gặp Mẹ ngày mai.</div>
+    <div class="sub">— ngủ ngon, Mẹ —</div>
+  </div>
 </div>
 
 <script>
-  function openDoor() {
-    const door = document.getElementById('door-screen');
-    door.classList.add('hidden');
-    setTimeout(() => {
-      door.style.display = 'none';
-      document.getElementById('app').classList.add('visible');
-    }, 1000);
+  /* ── Time of Day ──────────────────────────────────────────────── */
+  var TODs = ['sunrise', 'noon', 'sunset', 'night'];
+  var TOD_LABELS = {
+    sunrise: 'sáng sớm · chim hót',
+    noon:    'trưa · trời sáng',
+    sunset:  'chiều · trời quang',
+    night:   'đêm · đèn lồng sáng'
+  };
+  var TOD_GREETINGS = {
+    sunrise: 'sáng sớm, mặt trời đang lên',
+    noon:    'trưa, mặt trời trên cao',
+    sunset:  'chiều, mặt trời đang xuống',
+    night:   'đêm, mặt trời đã ngủ'
+  };
+
+  function setTOD(tod) {
+    document.getElementById('stage').setAttribute('data-tod', tod);
+    document.getElementById('ambientLabel').textContent = TOD_LABELS[tod];
+    var greet = document.getElementById('greeting');
+    if (greet) greet.textContent = '— ' + TOD_GREETINGS[tod] + ' —';
   }
 
-  function showRoom(room) {
-    document.getElementById('house-nav').style.display = 'none';
-    document.getElementById('room-' + room).classList.add('active');
-    if (room === 'family') loadFamilyPhotos();
+  function cycleTOD() {
+    var cur = document.getElementById('stage').getAttribute('data-tod');
+    var next = TODs[(TODs.indexOf(cur) + 1) % TODs.length];
+    setTOD(next);
+  }
+
+  /* ── Door ─────────────────────────────────────────────────────── */
+  function openDoor() {
+    var d = document.getElementById('door');
+    d.classList.add('opening');
+    setTimeout(function() {
+      document.getElementById('doorScreen').classList.add('gone');
+      document.getElementById('hub').classList.remove('hide');
+    }, 700);
+  }
+
+  /* ── Rooms ────────────────────────────────────────────────────── */
+  var ROOM_DATA = {
+    library: {
+      title: 'Thư Viện',
+      desc: 'Mỗi cuốn sách là kỷ niệm từ một người trong gia đình.',
+      body: '<div class="shelf"><div class="shelf-row">'
+        + '<div class="book has-new" style="background:#9c2a2a" onclick="openBook(\'Cuốn sách của Con Trai\',\'Mẹ ơi, con nhớ ngày Mẹ đưa con đi học ngày đầu tiên...\',\'Cái cặp con thì nặng quá, mà tay Mẹ thì ấm. Con không nhớ tên cô giáo, nhưng nhớ mùi cơm Mẹ gói cho con buổi trưa hôm đó.\',\'— Con Trai, Tháng Tư 2025\')">Con Trai</div>'
+        + '<div class="book" style="background:#5a7a52" onclick="openBook(\'Cuốn sách của Con Gái\',\'Mẹ luôn là người đầu tiên con gọi khi con cần lời khuyên.\',\'Hôm qua con gọi Mẹ ba lần, không phải vì con buồn — mà vì con muốn nghe Mẹ nói "ừ con".\',\'— Con Gái, Tháng Ba 2025\')">Con Gái</div>'
+        + '<div class="book" style="background:#3a4f6e" onclick="openBook(\'Cuốn sách của Bố\',\'...\',\'...\',\'— Bố\')">Bố</div>'
+        + '<div class="book" style="background:#a14d2e" onclick="openBook(\'Cuốn sách của Cháu An\',\'Bà ngoại nấu ăn ngon nhất thế giới!\',\'Con thích nhất là canh rau ngót của Bà. Con sẽ học nấu khi nào con lớn lên.\',\'— bé An, 7 tuổi\')">Cháu An</div>'
+        + '<div class="book" style="background:#e8b34a;color:#3a2818" onclick="openBook(\'Cuốn sách của Cháu Minh\',\'Cháu vẽ hình Bà Ngoại đẹp lắm.\',\'Bà mặc áo dài màu vàng giống mặt trời. Cháu để hình trên tủ lạnh.\',\'— bé Minh, 5 tuổi\')">Cháu Minh</div>'
+        + '<div class="book" style="background:#5e3a1a" onclick="openBook(\'Cuốn sách của Gia Đình\',\'Những bữa cơm chiều cuối tuần cùng nhau.\',\'Mỗi tối Chủ Nhật, dù xa hay gần, cả nhà đều gọi nhau ăn cơm. Mẹ luôn để chỗ trống giữa bàn — chỗ của ai về trễ.\',\'— Gia Đình\')">Gia Đình</div>'
+        + '</div></div><div class="plank"></div>'
+    },
+    music: {
+      title: 'Phòng Nhạc',
+      desc: 'Những bài hát mà mọi người liên tưởng đến Mẹ, kèm lời nhắn yêu thương.',
+      body: '<div class="music-layout">'
+        + '<div class="turntable"><div class="platter" id="platter"></div><div class="arm" id="arm"></div></div>'
+        + '<div class="songs">'
+        + '<div class="song" onclick="playSong(this)"><div class="play">&#9654;</div><div><h4>Bông Hồng Cài Áo</h4><div class="ded">"Bài này làm con nhớ Mẹ mỗi khi nghe." — Con Trai</div></div></div>'
+        + '<div class="song" onclick="playSong(this)"><div class="play">&#9654;</div><div><h4>Mẹ Tôi</h4><div class="ded">"Mẹ hay hát bài này ru con ngủ." — Con Gái</div></div></div>'
+        + '<div class="song" onclick="playSong(this)"><div class="play">&#9654;</div><div><h4>Diễm Xưa — Khánh Ly</h4><div class="ded">"Bài Mẹ nghe nhiều nhất, nhớ những chiều mưa Sài Gòn." — Bố</div></div></div>'
+        + '<div class="song" onclick="playSong(this)"><div class="play">&#9654;</div><div><h4>Cháu Yêu Bà</h4><div class="ded">"Cháu hát cho Bà nghe nha!" — bé An</div></div></div>'
+        + '</div></div>'
+    },
+    map: {
+      title: 'Phòng Bản Đồ',
+      desc: 'Những nơi Mẹ đã sống, đã ghé thăm, và những nơi Mẹ ước mơ sẽ đến.',
+      body: '<div class="map">'
+        + '<div class="map-legend">'
+        + '<div class="leg"><span class="d" style="background:#9c2a2a"></span>đã sống</div>'
+        + '<div class="leg"><span class="d" style="background:#5a7a52"></span>đã ghé thăm</div>'
+        + '<div class="leg"><span class="d" style="background:#3a4f6e"></span>ước mơ</div>'
+        + '</div>'
+        + '<div class="pins">'
+        + '<div class="pin"><span class="d" style="background:#9c2a2a"></span>Sài Gòn</div>'
+        + '<div class="pin"><span class="d" style="background:#9c2a2a"></span>Hà Nội</div>'
+        + '<div class="pin"><span class="d" style="background:#9c2a2a"></span>Huế</div>'
+        + '<div class="pin"><span class="d" style="background:#5a7a52"></span>Đà Lạt</div>'
+        + '<div class="pin"><span class="d" style="background:#5a7a52"></span>Nha Trang</div>'
+        + '<div class="pin"><span class="d" style="background:#5a7a52"></span>Hội An</div>'
+        + '<div class="pin"><span class="d" style="background:#5a7a52"></span>Phú Quốc</div>'
+        + '<div class="pin"><span class="d" style="background:#5a7a52"></span>Vũng Tàu</div>'
+        + '<div class="pin"><span class="d" style="background:#3a4f6e"></span>Vịnh Hạ Long</div>'
+        + '<div class="pin"><span class="d" style="background:#3a4f6e"></span>Paris</div>'
+        + '<div class="pin"><span class="d" style="background:#3a4f6e"></span>Tokyo</div>'
+        + '<div class="pin"><span class="d" style="background:#3a4f6e"></span>Kyoto</div>'
+        + '</div></div>'
+    },
+    family: {
+      title: 'Phòng Gia Đình',
+      desc: 'Bức tường đầy ảnh và hình vẽ của các cháu.',
+      body: '<div class="photo-wall" id="photo-wall"><div class="photo-status">Đang tải ảnh...</div></div>'
+    },
+    bedroom: {
+      title: 'Phòng Ngủ',
+      desc: 'Nơi riêng của Mẹ — không ai vào đây trừ khi Mẹ mời.',
+      body: '<div class="bedroom-scene">'
+        + '<img src="images/Gemini_Generated_Image_83o06e83o06e83o0.png" alt="Phòng ngủ của Mẹ"/>'
+        + '</div>'
+    },
+    garden: {
+      title: 'Vườn',
+      desc: 'Nơi cháu để lại tranh vẽ, hoa giấy, và những lời nhắn nhỏ.',
+      body: '<div class="photo-wall">'
+        + '<div class="frame" style="background:#5a7a52"><div class="photo p4"></div><div class="cap">"con yêu Bà"</div><div class="author">— bé An, 7 tuổi</div></div>'
+        + '<div class="frame" style="background:#a14d2e"><div class="photo p5"></div><div class="cap">hoa giấy bé Minh tặng</div><div class="author">— bé Minh, 5 tuổi</div></div>'
+        + '<div class="frame" style="background:#5e3a1a"><div class="photo p3"></div><div class="cap">cây bonsai của ông</div><div class="author">— bé An</div></div>'
+        + '</div>'
+    }
+  };
+
+  function enterRoom(key) {
+    var r = ROOM_DATA[key];
+    document.getElementById('roomTitle').textContent = r.title;
+    document.getElementById('roomDesc').textContent = r.desc;
+    document.getElementById('roomBody').innerHTML = r.body;
+    document.getElementById('room-view').classList.add('show');
+    if (key === 'family') {
+      familyPhotosLoaded = false;
+      loadFamilyPhotos();
+    }
   }
 
   function goHome() {
-    document.querySelectorAll('.room-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('house-nav').style.display = 'flex';
+    document.getElementById('room-view').classList.remove('show');
   }
 
-  function toggleRecord() {
-    document.getElementById('record').classList.toggle('spinning');
+  /* ── Book ──────────────────────────────────────────────────────── */
+  function openBook(title, b1, b2, meta) {
+    document.getElementById('bookTitle').textContent = title;
+    document.getElementById('bookBody1').textContent = b1;
+    document.getElementById('bookBody2').textContent = b2;
+    document.getElementById('bookMeta').textContent = meta;
+    document.getElementById('bookOpen').classList.add('show');
+  }
+  function closeBook() {
+    document.getElementById('bookOpen').classList.remove('show');
   }
 
-  // ── GOOGLE DRIVE: FAMILY PHOTOS ──
+  /* ── Music ─────────────────────────────────────────────────────── */
+  function playSong(el) {
+    document.querySelectorAll('.song').forEach(function(s) { s.classList.remove('playing'); });
+    el.classList.add('playing');
+    var platter = document.getElementById('platter');
+    var arm = document.getElementById('arm');
+    if (platter && arm) {
+      platter.classList.add('spinning');
+      arm.classList.add('playing');
+    }
+  }
+
+  /* ── Toolbar ───────────────────────────────────────────────────── */
+  var muted = true;
+  function toggleMute() {
+    muted = !muted;
+    document.getElementById('muteBtn').innerHTML = muted ? '&#9834;' : '&#9835;';
+  }
+
+  function farewell() {
+    document.getElementById('farewell').classList.add('show');
+    setTimeout(function() {
+      document.getElementById('farewell').classList.remove('show');
+    }, 4500);
+  }
+
+  /* ── Init: pick time of day from real clock ────────────────────── */
+  (function initTOD() {
+    var h = new Date().getHours();
+    var tod = 'noon';
+    if (h < 6 || h >= 21) tod = 'night';
+    else if (h < 10) tod = 'sunrise';
+    else if (h < 16) tod = 'noon';
+    else tod = 'sunset';
+    setTOD(tod);
+  })();
+
+  /* ── Google Drive: Family Photos ──────────────────────────────── */
   const DRIVE_FOLDER_ID = '1yNWI9_fKcAmIcItrkE3KTFYLIneVwq2C';
   const DRIVE_API_KEY = 'AIzaSyCwFRhJVfUdfj4p1sQ0OHI1yyhSNnEKP7s';
   let familyPhotosLoaded = false;
