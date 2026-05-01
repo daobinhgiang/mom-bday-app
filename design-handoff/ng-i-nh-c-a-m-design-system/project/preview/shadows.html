@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Shadows & Corners</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 22px 26px; background: var(--paper-cream); color: var(--ink); font-family: var(--font-serif); }
+  .head { font-family: var(--font-hand); font-size: 22px; margin: 0 0 6px; }
+  .sub { font-size: 12px; color: var(--ink-soft); font-style: italic; margin: 0 0 16px; }
+  .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .card { aspect-ratio: 1/1; background: var(--paper-cream-warm); border: 1px solid rgba(58,40,24,0.14); padding: 10px; display:flex; flex-direction:column; justify-content: flex-end; }
+  .card .name { font-family: var(--font-serif); font-size: 12px; color: var(--ink); }
+  .card .hint { font-family: var(--font-serif); font-size: 10px; color: var(--ink-faded); font-style: italic; }
+</style>
+</head>
+<body>
+<h3 class="head">Shadows — cast, never glowed</h3>
+<p class="sub">All warm-brown. Never blue, never huge blur radii.</p>
+<div class="row">
+  <div class="card" style="box-shadow: var(--shadow-paper); border-radius: var(--radius-paper)"><div class="name">shadow-paper</div><div class="hint">sheet on a desk</div></div>
+  <div class="card" style="box-shadow: var(--shadow-object); border-radius: var(--radius-soft)"><div class="name">shadow-object</div><div class="hint">book, photo, lantern</div></div>
+  <div class="card" style="box-shadow: var(--shadow-room); border-radius: var(--radius-soft)"><div class="name">shadow-room</div><div class="hint">focused in dim room</div></div>
+  <div class="card" style="box-shadow: var(--shadow-inset); border-radius: var(--radius-tile); background: var(--paper-grain)"><div class="name">shadow-inset</div><div class="hint">drawer, niche</div></div>
+</div>
+</body>
+</html>

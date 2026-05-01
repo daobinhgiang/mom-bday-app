@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Palette · Surfaces</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 18px 22px; background: var(--paper-cream); }
+  .row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .sw { aspect-ratio: 1.1 / 1; border-radius: var(--radius-soft); border: 1px solid rgba(58,40,24,0.18); padding: 10px; display: flex; flex-direction: column; justify-content: flex-end; box-shadow: var(--shadow-paper); }
+  .sw .name { font-family: var(--font-serif); font-size: 12px; color: var(--ink); }
+  .sw .hex { font-family: var(--font-serif); font-size: 10px; color: var(--ink-soft); font-style: italic; }
+  .sw.dark .name, .sw.dark .hex { color: #f4ead7; }
+  .head { font-family: var(--font-hand); font-size: 24px; color: var(--ink); margin: 0 0 12px; }
+</style>
+</head>
+<body>
+<h2 class="head">Surfaces — walls, paper, wood</h2>
+<div class="row">
+  <div class="sw" style="background:#f4ead7"><div class="name">paper-cream</div><div class="hex">#f4ead7</div></div>
+  <div class="sw" style="background:#ecdcb9"><div class="name">paper-cream-warm</div><div class="hex">#ecdcb9</div></div>
+  <div class="sw" style="background:#e3d2ad"><div class="name">paper-grain</div><div class="hex">#e3d2ad</div></div>
+  <div class="sw" style="background:#c9985a"><div class="name">wall-ochre</div><div class="hex">#c9985a</div></div>
+  <div class="sw dark" style="background:#a87538"><div class="name">wall-ochre-deep</div><div class="hex">#a87538</div></div>
+  <div class="sw" style="background:#d8a98a"><div class="name">wall-rose</div><div class="hex">#d8a98a</div></div>
+  <div class="sw dark" style="background:#8b5a2b"><div class="name">wood-teak</div><div class="hex">#8b5a2b</div></div>
+  <div class="sw dark" style="background:#5e3a1a"><div class="name">wood-teak-dark</div><div class="hex">#5e3a1a</div></div>
+  <div class="sw" style="background:#b58860"><div class="name">wood-teak-light</div><div class="hex">#b58860</div></div>
+  <div class="sw dark" style="background:#4a2418"><div class="name">wood-rosewood</div><div class="hex">#4a2418</div></div>
+  <div class="sw dark" style="background:#a14d2e"><div class="name">tile-roof</div><div class="hex">#a14d2e</div></div>
+  <div class="sw dark" style="background:#5d7a86"><div class="name">shutter-blue</div><div class="hex">#5d7a86</div></div>
+</div>
+</body>
+</html>

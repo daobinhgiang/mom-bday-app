@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Motion · Easings</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 22px 26px; background: var(--paper-cream); font-family: var(--font-serif); color: var(--ink); }
+  .head { font-family: var(--font-hand); font-size: 22px; margin: 0 0 14px; }
+  .row { display: flex; flex-direction: column; gap: 14px; }
+  .ease { display: grid; grid-template-columns: 130px 1fr 70px; gap: 14px; align-items: center; }
+  .ease .name { font-size: 13px; color: var(--ink-soft); font-style: italic; }
+  .ease .track { height: 8px; background: var(--paper-grain); border-radius: 4px; position: relative; overflow: hidden; }
+  .dot { position: absolute; top: -6px; width: 20px; height: 20px; border-radius: 50%; background: var(--lantern-yellow); box-shadow: var(--shadow-lantern); animation-iteration-count: infinite; animation-duration: 2.4s; }
+  .e1 { animation-name: a1; animation-timing-function: cubic-bezier(0.22,0.9,0.32,1); }
+  .e2 { animation-name: a1; animation-timing-function: cubic-bezier(0.34,1.2,0.64,1); }
+  .e3 { animation-name: a1; animation-timing-function: cubic-bezier(0.4,0,0.2,1); }
+  .e4 { animation-name: a1; animation-timing-function: cubic-bezier(0.5,0,0.4,1); }
+  @keyframes a1 { 0%,10% { left: 0; } 50%,60% { left: calc(100% - 20px); } 100% { left: 0; } }
+  .dur { font-size: 11px; color: var(--ink-faded); font-family: var(--font-serif); }
+</style>
+</head>
+<body>
+<h3 class="head">Motion — physical, with settle</h3>
+<div class="row">
+  <div class="ease"><span class="name">ease-settle</span><div class="track"><div class="dot e1"></div></div><span class="dur">480ms</span></div>
+  <div class="ease"><span class="name">ease-door</span><div class="track"><div class="dot e2"></div></div><span class="dur">720ms</span></div>
+  <div class="ease"><span class="name">ease-paper</span><div class="track"><div class="dot e3"></div></div><span class="dur">480ms</span></div>
+  <div class="ease"><span class="name">ease-weight</span><div class="track"><div class="dot e4"></div></div><span class="dur">720ms</span></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Component · Postcard</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 22px; background: var(--paper-cream); display:flex; gap: 22px; align-items: center; justify-content:center; min-height:100vh; }
+  .postcard { width: 280px; aspect-ratio: 3/2; background: #faf2dc; border-radius: 2px; padding: 18px 20px; box-shadow: var(--shadow-object); position: relative; transform: rotate(-2deg); border: 1px solid rgba(90,69,48,0.2); }
+  .postcard::before { content:''; position: absolute; top: 12px; right: 14px; width: 36px; height: 44px; background: var(--lacquer-red); border: 2px dashed var(--paper-cream); border-radius: 1px; }
+  .postcard p { font-family: var(--font-hand); font-size: 21px; color: var(--ink); line-height: 1.3; margin: 0 0 12px; }
+  .postcard .from { font-family: var(--font-serif); font-style: italic; font-size: 12px; color: var(--ink-faded); }
+  .pc2 { transform: rotate(1.5deg); background: #f4e3c1; }
+  .pc2::before { background: var(--jade-green); }
+</style>
+</head>
+<body>
+<div class="postcard">
+  <p>"Mẹ ơi, con nhớ ngày Mẹ đưa con đi học ngày đầu tiên..."</p>
+  <p class="from">— Con Trai · 2025</p>
+</div>
+<div class="postcard pc2">
+  <p>"Mẹ luôn là người đầu tiên con gọi khi con cần lời khuyên."</p>
+  <p class="from">— Con Gái</p>
+</div>
+</body>
+</html>

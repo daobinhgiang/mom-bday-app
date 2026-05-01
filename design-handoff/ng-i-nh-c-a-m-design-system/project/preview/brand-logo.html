@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Brand · Logo</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 24px 28px; background: var(--paper-cream); display:flex; align-items:center; justify-content:center; min-height: 280px; gap: 28px; }
+  .logo { display: flex; align-items: center; gap: 22px; }
+  .logo svg { width: 88px; height: 88px; flex-shrink: 0; }
+  .logo .word {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 76px;
+    line-height: 1;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+  .logo .tag {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink-faded);
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+<div class="logo">
+  <!-- Tiny painted house glyph -->
+  <svg viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="hand">
+        <feTurbulence type="fractalNoise" baseFrequency="1.0" numOctaves="2" seed="11"/>
+        <feDisplacementMap in="SourceGraphic" scale="0.8"/>
+      </filter>
+    </defs>
+    <g filter="url(#hand)" stroke="#3a2818" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M 4 50 L 44 14 L 84 50" fill="#a14d2e"/>
+      <rect x="14" y="50" width="60" height="34" fill="#c9985a"/>
+      <rect x="36" y="62" width="16" height="22" fill="#5e3a1a"/>
+      <rect x="22" y="58" width="8" height="8" fill="#f4d27a"/>
+      <rect x="58" y="58" width="8" height="8" fill="#f4d27a"/>
+    </g>
+  </svg>
+  <div>
+    <div class="word">Ngôi Nhà Của Mẹ</div>
+    <div class="tag">một ngôi nhà đầy kỷ niệm</div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Component · Lantern Indicator</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 22px; background: #2b3a52; display:flex; gap: 28px; align-items: center; justify-content:center; min-height: 100vh; color: var(--paper-cream); font-family: var(--font-serif); }
+  .item { text-align: center; }
+  .item img { width: 60px; height: 90px; }
+  .item .lit img { filter: drop-shadow(0 0 14px #f4d27a) drop-shadow(0 0 32px rgba(232,179,74,0.6)); animation: flicker 5.4s ease-in-out infinite; }
+  .item p { font-family: var(--font-serif); font-style: italic; font-size: 12px; color: rgba(244,234,215,0.7); margin-top: 8px; }
+  @keyframes flicker {
+    0%, 100% { opacity: 1; filter: brightness(1) drop-shadow(0 0 14px #f4d27a); }
+    43% { opacity: 0.92; filter: brightness(1.08) drop-shadow(0 0 18px #f4d27a); }
+    72% { opacity: 0.96; filter: brightness(1.05) drop-shadow(0 0 16px #f4d27a); }
+  }
+  .dim img { opacity: 0.55; filter: grayscale(0.4); }
+</style>
+</head>
+<body>
+<div class="item dim">
+  <img src="../assets/lantern.svg" alt=""/>
+  <p>nothing new — dim</p>
+</div>
+<div class="item lit">
+  <img src="../assets/lantern.svg" alt=""/>
+  <p>new content — glowing</p>
+</div>
+<div class="item lit" style="transform:scale(1.2)">
+  <img src="../assets/lantern.svg" alt=""/>
+  <p>recently added</p>
+</div>
+</body>
+</html>

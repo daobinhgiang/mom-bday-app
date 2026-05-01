@@ -6,7 +6,15 @@
 <title>Ngôi Nhà Của Mẹ</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><text y='50' font-size='50'>🏠</text></svg>">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Caveat+Brush&family=Kalam:wght@400;700&family=Patrick+Hand&subset=vietnamese&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Kalam:wght@400;700&family=Patrick+Hand&subset=vietnamese&display=swap');
+
+  @font-face {
+    font-family: 'BeeLeave';
+    src: url('fonts/BeeLeaveRegular-3zR66.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
 
   /* =========================================================================
      DESIGN TOKENS — from Ngôi Nhà Của Mẹ Design System
@@ -59,7 +67,7 @@
     --accent:             var(--lantern-yellow);
 
     /* Typography */
-    --font-hand:          'Caveat Brush', 'Kalam', 'Patrick Hand', 'Segoe Script', cursive;
+    --font-hand:          'BeeLeave', 'Kalam', 'Patrick Hand', 'Segoe Script', cursive;
     --font-serif:         'Lora', Georgia, serif;
 
     /* Spacing */
@@ -203,7 +211,7 @@
   .hub-header { text-align: center; margin-bottom: 18px; position: relative; z-index: 2; }
   .hub-header h1 {
     font-family: var(--font-hand); font-size: 56px; color: var(--ink);
-    margin: 0; line-height: 1;
+    margin: 0; line-height: 1; letter-spacing: -0.01em;
   }
   .hub-header .greeting {
     font-family: var(--font-serif); font-style: italic; font-size: 16px;
@@ -282,7 +290,7 @@
     border: 1px solid rgba(58,40,24,0.18);
     border-radius: 999px;
     padding: 6px 14px;
-    font-family: var(--font-serif); font-style: italic; font-size: 13px;
+    font-family: var(--font-serif); font-style: italic; font-size: 12px;
     color: var(--ink-soft);
     box-shadow: var(--shadow-paper);
     display: flex; gap: 8px; align-items: center;
@@ -335,7 +343,7 @@
   .room-title {
     font-family: var(--font-hand); font-size: 64px;
     color: var(--paper-cream); text-align: center;
-    margin: 6px 0 4px; line-height: 1;
+    margin: 6px 0 18px; line-height: 1.15; letter-spacing: -0.01em;
     text-shadow: 0 2px 6px rgba(0,0,0,0.18);
   }
   .room-desc {
@@ -362,7 +370,7 @@
     width: 56px; height: 180px;
     padding: 12px 6px; border-radius: 1px 3px 3px 1px;
     color: var(--paper-cream);
-    font-family: var(--font-hand); font-size: 16px; line-height: 1.1; text-align: center;
+    font-family: var(--font-serif); font-size: 14px; line-height: 1.1; text-align: center; letter-spacing: 0.02em;
     writing-mode: vertical-rl; transform: rotate(180deg);
     box-shadow: inset -4px 0 8px rgba(0,0,0,0.35), inset 3px 0 4px rgba(255,255,255,0.06);
     cursor: pointer;
@@ -408,7 +416,7 @@
   }
   .page { padding: 36px 38px; }
   .page h3 { font-family: var(--font-hand); font-size: 32px; color: var(--ink); margin: 0 0 16px; }
-  .page p  { font-family: var(--font-hand); font-size: 22px; color: var(--ink); line-height: 1.4; margin: 0 0 12px; }
+  .page p  { font-family: var(--font-serif); font-size: 20px; color: var(--ink); line-height: 1.55; margin: 0 0 12px; }
   .page .meta { font-family: var(--font-serif); font-style: italic; font-size: 12px; color: var(--ink-faded); }
   .page-close {
     position: absolute; top: 12px; right: 14px;
@@ -480,8 +488,8 @@
     display: flex; align-items: center; justify-content: center;
     font-family: var(--font-serif);
   }
-  .song h4 { font-family: var(--font-serif); font-size: 16px; color: var(--paper-cream); margin: 0 0 2px; }
-  .song .ded { font-family: var(--font-hand); font-size: 16px; color: rgba(244,234,215,0.78); }
+  .song h4 { font-family: var(--font-hand); font-size: 18px; line-height: 1.4; color: var(--paper-cream); margin: 0 0 4px; }
+  .song .ded { font-family: var(--font-serif); font-style: italic; font-size: 14px; line-height: 1.4; color: rgba(244,234,215,0.78); }
 
   /* =========================================================================
      MAP ROOM
@@ -503,7 +511,7 @@
   .pin {
     background: var(--paper-cream); border: 1px solid rgba(58,40,24,0.2);
     padding: 6px 12px 6px 8px; border-radius: 999px;
-    font-family: var(--font-hand); font-size: 18px; color: var(--ink);
+    font-family: var(--font-serif); font-size: 14px; color: var(--ink);
     display: flex; gap: 8px; align-items: center;
     box-shadow: var(--shadow-paper);
     transition: transform var(--dur-base) var(--ease-settle);
@@ -537,7 +545,23 @@
   .frame .photo.p5 { background: linear-gradient(160deg, #e89db0, #9c2a2a); }
   .frame .photo.p6 { background: linear-gradient(160deg, #8aa3b5, #3a4f6e); }
   .frame .cap { font-family: var(--font-hand); font-size: 18px; color: var(--paper-cream); text-align: center; margin-top: 8px; }
-  .frame .author { font-family: var(--font-serif); font-style: italic; font-size: 11px; color: rgba(244,234,215,0.6); text-align: center; margin-top: 2px; }
+  .frame .author { font-family: var(--font-serif); font-style: italic; font-size: 12px; color: rgba(244,234,215,0.6); text-align: center; margin-top: 2px; }
+  .frame img {
+    width: 100%; aspect-ratio: 4/3;
+    object-fit: cover;
+    border: 1px solid rgba(0,0,0,0.4);
+    display: block;
+    background: linear-gradient(160deg, #b58860, #5e3a1a);
+  }
+  .photo-status {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ink-ghost);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.95rem;
+  }
 
   /* =========================================================================
      BEDROOM — Room Illustration
@@ -545,14 +569,37 @@
   .bedroom-scene {
     max-width: 680px;
     margin: 0 auto;
+    position: relative;
     border-radius: var(--radius-soft);
     box-shadow: var(--shadow-room);
     overflow: hidden;
   }
-  .bedroom-scene img {
+  .bedroom-scene > img {
     width: 100%; height: auto; display: block;
     image-rendering: pixelated;
   }
+  .bedroom-bookshelf {
+    position: absolute;
+    top: 5%; left: 3%;
+    width: 38%;
+    cursor: pointer;
+    transition: transform var(--dur-base) var(--ease-settle), filter var(--dur-base) var(--ease-settle);
+  }
+  .bedroom-bookshelf:hover {
+    transform: scale(1.04) rotate(-0.5deg);
+    filter: drop-shadow(0 0 18px rgba(232,179,74,0.55)) drop-shadow(0 0 40px rgba(244,210,122,0.35));
+  }
+  .bedroom-bookshelf img {
+    width: 100%; height: auto; display: block;
+    image-rendering: pixelated;
+  }
+  .bedroom-bookshelf svg {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--dur-base) var(--ease-settle);
+  }
+  .bedroom-bookshelf:hover svg { opacity: 1; }
 
   /* =========================================================================
      FAREWELL SCREEN
@@ -577,21 +624,6 @@
   .farewell-screen .sub {
     font-family: var(--font-hand); font-size: 22px;
     color: rgba(244,234,215,0.6);
-  }
-  .photo-frame img {
-    width: 100%; height: 140px;
-    object-fit: cover;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    display: block;
-    background: #4a3f2f;
-  }
-  .photo-status {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 40px 20px;
-    color: #7f8fa6;
-    font-size: 0.95rem;
   }
 
   /* =========================================================================
@@ -801,13 +833,25 @@
     family: {
       title: 'Phòng Gia Đình',
       desc: 'Bức tường đầy ảnh và hình vẽ của các cháu.',
-      body: '<div class="photo-wall" id="photo-wall"><div class="photo-status">Đang tải ảnh...</div></div>'
+      body: '<div class="photo-wall" id="photo-wall">'
+        + '<div class="photo-status">Đang tải ảnh...</div>'
+        + '</div>'
     },
     bedroom: {
       title: 'Phòng Ngủ',
       desc: 'Nơi riêng của Mẹ — không ai vào đây trừ khi Mẹ mời.',
       body: '<div class="bedroom-scene">'
         + '<img src="images/Gemini_Generated_Image_83o06e83o06e83o0.png" alt="Phòng ngủ của Mẹ"/>'
+        + '<div class="bedroom-bookshelf">'
+        +   '<img src="images/bookshelf.png" alt="Tủ sách"/>'
+        +   '<svg viewBox="0 0 100 100" preserveAspectRatio="none"><defs>'
+        +     '<radialGradient id="shelfGlow" cx="50%" cy="50%" r="55%">'
+        +       '<stop offset="0%" stop-color="#f4d27a" stop-opacity="0.3"/>'
+        +       '<stop offset="70%" stop-color="#e8b34a" stop-opacity="0.12"/>'
+        +       '<stop offset="100%" stop-color="#e8b34a" stop-opacity="0"/>'
+        +     '</radialGradient></defs>'
+        +   '<rect width="100" height="100" fill="url(#shelfGlow)"/></svg>'
+        + '</div>'
         + '</div>'
     },
     garden: {
@@ -827,10 +871,7 @@
     document.getElementById('roomDesc').textContent = r.desc;
     document.getElementById('roomBody').innerHTML = r.body;
     document.getElementById('room-view').classList.add('show');
-    if (key === 'family') {
-      familyPhotosLoaded = false;
-      loadFamilyPhotos();
-    }
+    if (key === 'family') loadFamilyPhotos();
   }
 
   function goHome() {
@@ -886,52 +927,56 @@
     setTOD(tod);
   })();
 
-  /* ── Google Drive: Family Photos ──────────────────────────────── */
-  const DRIVE_FOLDER_ID = '1yNWI9_fKcAmIcItrkE3KTFYLIneVwq2C';
-  const DRIVE_API_KEY = 'AIzaSyCwFRhJVfUdfj4p1sQ0OHI1yyhSNnEKP7s';
-  let familyPhotosLoaded = false;
+  /* ── Google Drive: Family Photos ─────────────────────────────── */
+  var DRIVE_FOLDER_ID = '1yNWI9_fKcAmIcItrkE3KTFYLIneVwq2C';
+  var DRIVE_API_KEY = 'AIzaSyCwFRhJVfUdfj4p1sQ0OHI1yyhSNnEKP7s';
+  var familyPhotosLoaded = false;
 
   function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c => (
-      {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
-    ));
+    return String(s).replace(/[&<>"']/g, function(c) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
   }
 
-  async function loadFamilyPhotos() {
+  function loadFamilyPhotos() {
     if (familyPhotosLoaded) return;
     familyPhotosLoaded = true;
 
-    const wall = document.getElementById('photo-wall');
-    const url = 'https://www.googleapis.com/drive/v3/files'
+    var wall = document.getElementById('photo-wall');
+    if (!wall) return;
+
+    var url = 'https://www.googleapis.com/drive/v3/files'
       + '?q=' + encodeURIComponent("'" + DRIVE_FOLDER_ID + "' in parents and trashed=false")
       + '&fields=' + encodeURIComponent('files(id,name,mimeType,description)')
       + '&orderBy=createdTime+desc'
       + '&pageSize=100'
       + '&key=' + DRIVE_API_KEY;
 
-    try {
-      const res = await fetch(url);
+    fetch(url).then(function(res) {
       if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      const photos = (data.files || []).filter(f => f.mimeType && f.mimeType.startsWith('image/'));
+      return res.json();
+    }).then(function(data) {
+      var photos = (data.files || []).filter(function(f) {
+        return f.mimeType && f.mimeType.startsWith('image/');
+      });
 
       if (photos.length === 0) {
         wall.innerHTML = '<div class="photo-status">Chưa có ảnh trong thư mục.</div>';
         return;
       }
 
-      wall.innerHTML = photos.map(f => {
-        const caption = escapeHtml(f.description || f.name.replace(/\.[^.]+$/, ''));
-        const src = 'https://drive.google.com/thumbnail?id=' + f.id + '&sz=w1000';
-        return '<div class="photo-frame">'
+      wall.innerHTML = photos.map(function(f) {
+        var caption = escapeHtml(f.description || f.name.replace(/\.[^.]+$/, ''));
+        var src = 'https://drive.google.com/thumbnail?id=' + f.id + '&sz=w1000';
+        return '<div class="frame">'
           + '<img src="' + src + '" alt="' + caption + '" loading="lazy">'
-          + '<p>' + caption + '</p>'
+          + '<div class="cap">' + caption + '</div>'
           + '</div>';
       }).join('');
-    } catch (err) {
+    }).catch(function(err) {
       familyPhotosLoaded = false;
       wall.innerHTML = '<div class="photo-status">Không tải được ảnh. (' + escapeHtml(err.message) + ')</div>';
-    }
+    });
   }
 </script>
 
