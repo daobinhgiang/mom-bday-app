@@ -211,7 +211,7 @@
   .hub-header { text-align: center; margin-bottom: 18px; position: relative; z-index: 2; }
   .hub-header h1 {
     font-family: var(--font-hand); font-size: 56px; color: var(--ink);
-    margin: 0; line-height: 1;
+    margin: 0; line-height: 1; letter-spacing: -0.01em;
   }
   .hub-header .greeting {
     font-family: var(--font-serif); font-style: italic; font-size: 16px;
@@ -290,7 +290,7 @@
     border: 1px solid rgba(58,40,24,0.18);
     border-radius: 999px;
     padding: 6px 14px;
-    font-family: var(--font-serif); font-style: italic; font-size: 13px;
+    font-family: var(--font-serif); font-style: italic; font-size: 12px;
     color: var(--ink-soft);
     box-shadow: var(--shadow-paper);
     display: flex; gap: 8px; align-items: center;
@@ -343,7 +343,7 @@
   .room-title {
     font-family: var(--font-hand); font-size: 64px;
     color: var(--paper-cream); text-align: center;
-    margin: 6px 0 4px; line-height: 1;
+    margin: 6px 0 18px; line-height: 1.15; letter-spacing: -0.01em;
     text-shadow: 0 2px 6px rgba(0,0,0,0.18);
   }
   .room-desc {
@@ -370,7 +370,7 @@
     width: 56px; height: 180px;
     padding: 12px 6px; border-radius: 1px 3px 3px 1px;
     color: var(--paper-cream);
-    font-family: var(--font-hand); font-size: 16px; line-height: 1.1; text-align: center;
+    font-family: var(--font-serif); font-size: 14px; line-height: 1.1; text-align: center; letter-spacing: 0.02em;
     writing-mode: vertical-rl; transform: rotate(180deg);
     box-shadow: inset -4px 0 8px rgba(0,0,0,0.35), inset 3px 0 4px rgba(255,255,255,0.06);
     cursor: pointer;
@@ -416,7 +416,7 @@
   }
   .page { padding: 36px 38px; }
   .page h3 { font-family: var(--font-hand); font-size: 32px; color: var(--ink); margin: 0 0 16px; }
-  .page p  { font-family: var(--font-hand); font-size: 22px; color: var(--ink); line-height: 1.4; margin: 0 0 12px; }
+  .page p  { font-family: var(--font-serif); font-size: 20px; color: var(--ink); line-height: 1.55; margin: 0 0 12px; }
   .page .meta { font-family: var(--font-serif); font-style: italic; font-size: 12px; color: var(--ink-faded); }
   .page-close {
     position: absolute; top: 12px; right: 14px;
@@ -488,8 +488,8 @@
     display: flex; align-items: center; justify-content: center;
     font-family: var(--font-serif);
   }
-  .song h4 { font-family: var(--font-serif); font-size: 16px; color: var(--paper-cream); margin: 0 0 2px; }
-  .song .ded { font-family: var(--font-hand); font-size: 16px; color: rgba(244,234,215,0.78); }
+  .song h4 { font-family: var(--font-hand); font-size: 18px; line-height: 1.4; color: var(--paper-cream); margin: 0 0 4px; }
+  .song .ded { font-family: var(--font-serif); font-style: italic; font-size: 14px; line-height: 1.4; color: rgba(244,234,215,0.78); }
 
   /* =========================================================================
      MAP ROOM
@@ -511,7 +511,7 @@
   .pin {
     background: var(--paper-cream); border: 1px solid rgba(58,40,24,0.2);
     padding: 6px 12px 6px 8px; border-radius: 999px;
-    font-family: var(--font-hand); font-size: 18px; color: var(--ink);
+    font-family: var(--font-serif); font-size: 14px; color: var(--ink);
     display: flex; gap: 8px; align-items: center;
     box-shadow: var(--shadow-paper);
     transition: transform var(--dur-base) var(--ease-settle);
@@ -545,7 +545,7 @@
   .frame .photo.p5 { background: linear-gradient(160deg, #e89db0, #9c2a2a); }
   .frame .photo.p6 { background: linear-gradient(160deg, #8aa3b5, #3a4f6e); }
   .frame .cap { font-family: var(--font-hand); font-size: 18px; color: var(--paper-cream); text-align: center; margin-top: 8px; }
-  .frame .author { font-family: var(--font-serif); font-style: italic; font-size: 11px; color: rgba(244,234,215,0.6); text-align: center; margin-top: 2px; }
+  .frame .author { font-family: var(--font-serif); font-style: italic; font-size: 12px; color: rgba(244,234,215,0.6); text-align: center; margin-top: 2px; }
   .frame img {
     width: 100%; aspect-ratio: 4/3;
     object-fit: cover;
