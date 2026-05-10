@@ -5,13 +5,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Quyển sách</title>
   <style>
+    @font-face {
+      font-family: 'Lora';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('fonts/lora-v37-regular.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Lora';
+      font-style: italic;
+      font-weight: 400;
+      font-display: swap;
+      src: url('fonts/lora-v37-italic.woff') format('woff');
+    }
+    @font-face {
+      font-family: 'Patrick Hand';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('fonts/patrick-hand-v25-regular.woff2') format('woff2');
+    }
+
+    :root {
+      /* Default = Bố (shelf 1) brown */
+      --bg-from:        #6b4423;
+      --bg-mid:         #3e2410;
+      --bg-to:          #2a1808;
+      --text:           #f4e3c1;
+      --heading:        #f4d990;
+      --heading-shadow: #2a1808;
+      --heading-glow:   rgba(255, 200, 100, 0.35);
+      --paper-bg:       #f4e3c1;
+      --paper-text:     #2a1808;
+      --back-text:      #f4d990;
+      --back-border:    #8b5a2b;
+      --back-hover-bg:  #8b5a2b;
+      --back-hover-fg:  #fff8e7;
+    }
+
+    /* Mẹ (shelf 3) — magenta */
+    body.theme-me {
+      --bg-from:        #ff7af0;
+      --bg-mid:         #f734e1;
+      --bg-to:          #2e0028;
+      --text:           #ffe6fb;
+      --heading:        #ffd6f7;
+      --heading-shadow: #2e0028;
+      --heading-glow:   rgba(255, 130, 220, 0.5);
+      --paper-bg:       #fff0fa;
+      --paper-text:     #2e0028;
+      --back-text:      #ffd6f7;
+      --back-border:    #c020a8;
+      --back-hover-bg:  #c020a8;
+      --back-hover-fg:  #ffffff;
+    }
+
     html, body {
       margin: 0;
       min-height: 100vh;
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Lora', Georgia, serif;
       background:
-        radial-gradient(ellipse at top, #6b4423 0%, #3e2410 70%, #2a1808 100%);
-      color: #f4e3c1;
+        radial-gradient(ellipse at top, var(--bg-from) 0%, var(--bg-mid) 60%, var(--bg-to) 100%);
+      color: var(--text);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -20,46 +76,147 @@
       padding: 40px 24px;
       box-sizing: border-box;
     }
+
     h1 {
       margin: 0;
-      font-size: clamp(28px, 5vw, 48px);
-      color: #f4d990;
-      text-shadow: 0 2px 0 #2a1808, 0 0 18px rgba(255, 200, 100, 0.35);
+      font-family: 'Patrick Hand', 'Lora', Georgia, serif;
+      font-size: clamp(32px, 5.5vw, 54px);
+      color: var(--heading);
+      text-shadow: 0 2px 0 var(--heading-shadow), 0 0 18px var(--heading-glow);
     }
-    .page {
+
+    /* Default content card (used when no themed book art is active). */
+    .paper-card {
       max-width: 600px;
-      background: #f4e3c1;
-      color: #2a1808;
+      background: var(--paper-bg);
+      color: var(--paper-text);
       padding: 40px 48px;
       border-radius: 4px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.6);
       line-height: 1.7;
       font-size: 16px;
     }
+
+    /* Open-book art surface (Mẹ) — content overlaid on the two pages. */
+    .book-art {
+      position: relative;
+      width: min(92vw, 760px);
+      aspect-ratio: 432 / 319;
+      display: none; /* shown only when a themed body class enables it */
+      filter: drop-shadow(0 18px 40px rgba(0,0,0,0.55));
+    }
+    .book-art img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      image-rendering: pixelated;
+      pointer-events: none;
+      user-select: none;
+    }
+    .book-art .leaf {
+      position: absolute;
+      top: 26%;
+      bottom: 24%;
+      padding: 4% 5%;
+      box-sizing: border-box;
+      color: var(--paper-text);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .book-art .leaf.left  { left: 18%; width: 30%; }
+    .book-art .leaf.right { left: 52%; width: 30%; }
+
+    .book-art .leaf h2 {
+      margin: 0;
+      font-family: 'Patrick Hand', 'Lora', Georgia, serif;
+      font-size: clamp(14px, 2.4vw, 22px);
+      line-height: 1.15;
+      color: var(--paper-text);
+    }
+    .book-art .leaf .body {
+      font-size: clamp(10px, 1.4vw, 13px);
+      line-height: 1.45;
+      font-style: italic;
+      color: var(--paper-text);
+    }
+    .book-art .leaf .meta {
+      margin-top: auto;
+      font-size: clamp(9px, 1.1vw, 11px);
+      opacity: 0.55;
+    }
+
+    /* Theme-me uses the book art instead of the paper card. */
+    body.theme-me .paper-card { display: none; }
+    body.theme-me .book-art   { display: block; }
+    body.theme-me h1          { display: none; } /* title moves onto the left page */
+
     a.back {
-      color: #f4d990;
+      color: var(--back-text);
       text-decoration: none;
       padding: 8px 14px;
-      border: 1px solid #8b5a2b;
+      border: 1px solid var(--back-border);
       border-radius: 6px;
       background: rgba(0,0,0,0.25);
     }
-    a.back:hover { background: #8b5a2b; color: #fff8e7; }
+    a.back:hover { background: var(--back-hover-bg); color: var(--back-hover-fg); }
   </style>
 </head>
 <body>
   <h1 id="bookTitle">Quyển sách</h1>
-  <div class="page">
-    <p>Trang này dành cho nội dung của quyển sách. Bố có thể viết kỷ niệm, câu chuyện, hoặc những lời nhắn ở đây.</p>
+
+  <div class="paper-card">
+    <p id="bookBody">Trang này dành cho nội dung của quyển sách. Có thể viết kỷ niệm, câu chuyện, hoặc những lời nhắn ở đây.</p>
     <p id="meta" style="opacity:0.6; font-size:13px; margin-top:24px;"></p>
   </div>
-  <a class="back" href="shelf-1.html">&larr; Quay lại kệ sách</a>
+
+  <div class="book-art" aria-hidden="false">
+    <img src="images/library-room/book mom.png" alt="Quyển sách của Mẹ" />
+    <div class="leaf left">
+      <h2 id="bookTitleArt">Quyển sách của Mẹ</h2>
+      <div class="meta" id="metaArt"></div>
+    </div>
+    <div class="leaf right">
+      <div class="body" id="bookBodyArt">
+        Trang này dành cho những kỷ niệm, câu chuyện và lời nhắn của Mẹ.
+      </div>
+    </div>
+  </div>
+
+  <a class="back" id="backLink" href="shelf-1.html">&larr; Quay lại kệ sách</a>
 
   <script>
     const params = new URLSearchParams(location.search);
-    const id = params.get('id');
+    const id = params.get('id') || '';
+
+    const themeMap = {
+      'me-': {
+        cls:   'theme-me',
+        back:  'shelf-3.html',
+        title: 'Quyển sách của Mẹ',
+        body:  'Trang này dành cho những kỷ niệm, câu chuyện và lời nhắn của Mẹ.',
+      },
+    };
+
+    for (const prefix in themeMap) {
+      if (id.startsWith(prefix)) {
+        const t = themeMap[prefix];
+        document.body.classList.add(t.cls);
+        document.getElementById('backLink').setAttribute('href', t.back);
+        document.getElementById('bookTitle').textContent    = t.title;
+        document.getElementById('bookTitleArt').textContent = t.title;
+        document.getElementById('bookBody').textContent     = t.body;
+        document.getElementById('bookBodyArt').textContent  = t.body;
+        document.title = t.title;
+        break;
+      }
+    }
+
     if (id) {
-      document.getElementById('meta').textContent = 'Sách số ' + id;
+      const metaText = 'Sách số ' + id;
+      document.getElementById('meta').textContent    = metaText;
+      document.getElementById('metaArt').textContent = metaText;
     }
   </script>
 </body>
