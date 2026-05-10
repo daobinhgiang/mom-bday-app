@@ -256,17 +256,64 @@
   /* =========================================================================
      HUB (HOUSE CROSS-SECTION)
      ========================================================================= */
-  #hub { position: relative; min-height: 100vh; padding: 16px 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+  #hub {
+    position: relative; min-height: 100vh; padding: 16px 24px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background: linear-gradient(
+      to bottom,
+      var(--hub-sky-top, #d4c4a0) 0%,
+      var(--hub-sky-mid, #e8dcc4) 35%,
+      var(--hub-ground, #c9b896) 75%,
+      var(--hub-earth, #8b7355) 100%
+    );
+    transition: background 1.2s var(--ease-settle);
+  }
   #hub.hide { display: none; }
 
-  .hub-header { text-align: center; margin-bottom: 10px; position: relative; z-index: 2; flex-shrink: 0; }
+  /* Time-of-day hub backgrounds */
+  .stage[data-tod="sunrise"] #hub {
+    --hub-sky-top: #e8c89a; --hub-sky-mid: #f0ddb8; --hub-ground: #d4be94; --hub-earth: #8b7355;
+  }
+  .stage[data-tod="noon"] #hub {
+    --hub-sky-top: #d4c4a0; --hub-sky-mid: #e8dcc4; --hub-ground: #c9b896; --hub-earth: #8b7355;
+  }
+  .stage[data-tod="sunset"] #hub {
+    --hub-sky-top: #c4856a; --hub-sky-mid: #d8a878; --hub-ground: #b89878; --hub-earth: #6b5540;
+  }
+  .stage[data-tod="night"] #hub {
+    --hub-sky-top: #1e2a3a; --hub-sky-mid: #2a3545; --hub-ground: #3a3028; --hub-earth: #2a2018;
+  }
+  .stage[data-tod="night"] .hub-header h1 { color: var(--lantern-glow); }
+  .stage[data-tod="night"] .hub-header .greeting { color: rgba(244,210,122,0.5); }
+  .stage[data-tod="sunset"] .hub-header h1 { color: var(--wood-teak-dark); }
+
+  /* Ambient moth on hub */
+  .hub-moth {
+    position: absolute; pointer-events: none; z-index: 3;
+    font-size: 12px; opacity: 0.4;
+    animation: hubMoth 8s ease-in-out infinite;
+  }
+  @keyframes hubMoth {
+    0%,100% { transform: translate(0, 0) rotate(0deg); }
+    25%     { transform: translate(15px, -20px) rotate(12deg); }
+    50%     { transform: translate(-10px, -30px) rotate(-8deg); }
+    75%     { transform: translate(20px, -15px) rotate(6deg); }
+  }
+  .stage[data-tod="night"] .hub-moth { opacity: 0.6; }
+  .stage[data-tod="noon"] .hub-moth { opacity: 0.2; }
+
+  .hub-header {
+    text-align: center; margin-bottom: -8px; position: relative; z-index: 2; flex-shrink: 0;
+  }
   .hub-header h1 {
     font-family: var(--font-hand); font-size: 44px; color: var(--ink);
     margin: 0; line-height: 1; letter-spacing: -0.01em;
+    text-shadow: 0 1px 0 rgba(244,234,215,0.6), 0 2px 8px rgba(58,40,24,0.15);
   }
   .hub-header .greeting {
-    font-family: var(--font-serif); font-style: italic; font-size: 16px;
-    color: var(--ink-soft); margin-top: 4px;
+    font-family: var(--font-serif); font-style: italic; font-size: 13px;
+    color: var(--ink-faded); margin-top: 2px; opacity: 0.7;
+    letter-spacing: 0.5px;
   }
 
   .house {
@@ -286,10 +333,16 @@
     position: absolute;
     cursor: pointer;
     border-radius: var(--radius-soft);
-    transition: background var(--dur-base) var(--ease-settle), transform var(--dur-base) var(--ease-settle);
+    transition: background var(--dur-base) var(--ease-settle), transform var(--dur-base) var(--ease-settle),
+                box-shadow var(--dur-base) var(--ease-settle), filter var(--dur-base) var(--ease-settle);
     background: rgba(244,210,122,0);
   }
-  .room-hot:hover { background: rgba(244,210,122,0.18); transform: scale(1.01); }
+  .room-hot:hover {
+    background: rgba(244,210,122,0.18);
+    transform: scale(1.01);
+    box-shadow: inset 0 0 30px rgba(232,179,74,0.35), 0 0 20px rgba(244,210,122,0.2);
+    filter: brightness(1.08) saturate(1.1);
+  }
   .room-hot:hover .room-tag { opacity: 1; transform: translate(-50%, 0); }
 
   .room-tag {
@@ -564,7 +617,8 @@
       radial-gradient(ellipse at 70% 70%, rgba(58,40,24,0.1), transparent 60%),
       url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
     border: none;
-    padding: 24px 28px;
+    /* extra top: clears fixed home-frame (aligns with family room) */
+    padding: 88px 28px 24px;
     box-shadow: none;
     border-radius: 0;
     position: relative;
@@ -704,6 +758,65 @@
     border-top: 1px solid rgba(58,40,24,0.12);
     padding-top: 4px;
   }
+  .pin-photos {
+    display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px;
+  }
+  .pin-photos img {
+    width: 56px; height: 56px; object-fit: cover; border-radius: 3px;
+    border: 1px solid rgba(58,40,24,0.15); cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .pin-photos img:hover { transform: scale(1.1); z-index: 1; }
+  .pin-add-photo-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: transparent; border: 1px dashed rgba(58,40,24,0.25);
+    color: rgba(58,40,24,0.5); font-family: var(--font-serif);
+    font-size: 11px; padding: 3px 8px; border-radius: 3px;
+    cursor: pointer; margin-top: 6px;
+  }
+  .pin-add-photo-btn:hover { border-color: rgba(58,40,24,0.45); color: var(--ink); }
+
+  /* Pin photo lightbox */
+  .pin-lightbox {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85); z-index: 10000;
+    justify-content: center; align-items: center;
+    flex-direction: column;
+  }
+  .pin-lightbox.show { display: flex; }
+  .pin-lightbox img {
+    max-width: 90vw; max-height: 80vh; border-radius: 6px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  }
+  .pin-lightbox-close {
+    position: absolute; top: 20px; right: 24px;
+    background: none; border: none; color: #fff;
+    font-size: 28px; cursor: pointer; opacity: 0.7;
+  }
+  .pin-lightbox-close:hover { opacity: 1; }
+  .pin-lightbox-caption {
+    color: rgba(255,255,255,0.7); font-family: var(--font-serif);
+    font-size: 13px; margin-top: 10px; font-style: italic;
+  }
+
+  /* Upload preview in modal */
+  .pin-upload-preview {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;
+  }
+  .pin-upload-preview .pin-upload-thumb {
+    position: relative; width: 52px; height: 52px;
+  }
+  .pin-upload-preview .pin-upload-thumb img {
+    width: 52px; height: 52px; object-fit: cover; border-radius: 3px;
+    border: 1px solid rgba(58,40,24,0.2);
+  }
+  .pin-upload-preview .pin-upload-thumb .pin-thumb-remove {
+    position: absolute; top: -4px; right: -4px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #9c2a2a; color: #fff; border: none;
+    font-size: 10px; line-height: 16px; cursor: pointer;
+    padding: 0;
+  }
 
   /* Scale bar decoration */
   .map-scale {
@@ -771,11 +884,83 @@
   .pin:hover { transform: rotate(-1deg) scale(1.05); box-shadow: 0 2px 8px rgba(58,40,24,0.2); }
   .pin .d { width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(58,40,24,0.15); }
   .pin .pin-flag { font-size: 14px; line-height: 1; }
+  .pin .pin-delete {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: rgba(156,42,42,0.15); border: none;
+    color: #9c2a2a; font-size: 11px; line-height: 16px;
+    cursor: pointer; padding: 0; margin-left: 2px;
+    opacity: 0; transition: opacity 0.2s;
+    font-family: sans-serif;
+  }
+  .pin:hover .pin-delete { opacity: 1; }
+  .pin-delete:hover { background: rgba(156,42,42,0.35); }
+
+  /* Add pin button */
+  .pin-add-btn {
+    background: transparent; border: 1px dashed rgba(58,40,24,0.3);
+    padding: 6px 14px; border-radius: 999px;
+    font-family: var(--font-serif); font-size: 13px; color: rgba(58,40,24,0.5);
+    cursor: pointer; transition: all 0.2s;
+    display: flex; gap: 6px; align-items: center;
+    margin: 12px auto 0;
+  }
+  .pin-add-btn:hover { border-color: rgba(58,40,24,0.5); color: var(--ink); background: rgba(244,234,215,0.5); }
+
+  /* Add pin modal */
+  .pin-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 9999;
+    justify-content: center; align-items: center;
+  }
+  .pin-modal-overlay.show { display: flex; }
+  .pin-modal {
+    background: var(--paper-cream); border-radius: 8px;
+    padding: 24px; width: 340px; max-width: 90vw;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    font-family: var(--font-serif); color: var(--ink);
+  }
+  .pin-modal h3 {
+    margin: 0 0 16px; font-size: 16px; text-align: center;
+    color: var(--ink); letter-spacing: 1px;
+  }
+  .pin-modal label {
+    display: block; font-size: 11px; color: rgba(58,40,24,0.6);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; margin-top: 10px;
+  }
+  .pin-modal input, .pin-modal select, .pin-modal textarea {
+    width: 100%; box-sizing: border-box; padding: 8px 10px;
+    border: 1px solid rgba(58,40,24,0.2); border-radius: 4px;
+    font-family: var(--font-serif); font-size: 13px; color: var(--ink);
+    background: rgba(255,255,255,0.6);
+  }
+  .pin-modal textarea { resize: vertical; min-height: 50px; }
+  .pin-modal-actions {
+    display: flex; gap: 8px; margin-top: 18px; justify-content: flex-end;
+  }
+  .pin-modal-actions button {
+    padding: 8px 18px; border-radius: 4px; border: 1px solid rgba(58,40,24,0.2);
+    font-family: var(--font-serif); font-size: 13px; cursor: pointer;
+  }
+  .pin-modal-actions .pin-modal-cancel { background: transparent; color: var(--ink); }
+  .pin-modal-actions .pin-modal-save { background: #5a7a52; color: #fff; border-color: #5a7a52; }
+  .pin-modal-actions .pin-modal-save:hover { background: #4a6a42; }
+  .pin-modal .pin-modal-hint {
+    font-size: 11px; color: rgba(58,40,24,0.45); font-style: italic; margin-top: 2px;
+  }
 
   /* =========================================================================
      FAMILY ROOM — Photo Wall
      ========================================================================= */
   .photo-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px; }
+  /* Family room only (#photo-wall); clears fixed home-frame + side inset like shelf */
+  #photo-wall { padding: 88px 18px 28px; }
+  /* Loading copy: center in the room, not stuck under top padding as first grid row */
+  #photo-wall:has(> .photo-status:only-child) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: min(100vh, 100dvh);
+  }
   .frame {
     background: var(--wood-teak-dark);
     padding: 12px 12px 26px;
@@ -838,6 +1023,54 @@
   }
 
   /* =========================================================================
+     FAMILY ROOM — Living Room Scene (library-style layered images)
+     ========================================================================= */
+  .family-scene {
+    position: fixed; inset: 0; z-index: 45;
+    display: flex; align-items: center; justify-content: center;
+    background: #8B6040;
+    overflow: hidden;
+  }
+  .family-scene .scene {
+    position: relative;
+    width: min(95vw, 900px);
+    aspect-ratio: 4 / 3;
+    image-rendering: pixelated;
+  }
+  .family-scene .scene > img.base {
+    width: 100%; height: 100%;
+    display: block;
+    image-rendering: pixelated;
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .family-scene .shelf-wall {
+    position: absolute;
+    display: block;
+    cursor: pointer;
+    transition: filter 160ms ease, transform 160ms ease;
+    filter: drop-shadow(0 0 0 transparent);
+    z-index: 1;
+    top: 0; left: 0; width: 100%; height: 100%;
+  }
+  .family-scene .shelf-wall img {
+    width: 100%; height: 100%;
+    display: block;
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+  .family-scene .shelf-wall:hover,
+  .family-scene .shelf-wall:focus-visible {
+    filter:
+      drop-shadow(0 0 6px #ffe066)
+      drop-shadow(0 0 14px #ffd43b)
+      drop-shadow(0 0 24px rgba(255, 212, 59, 0.6));
+    transform: translateY(-2px);
+    outline: none;
+  }
+
+  /* =========================================================================
      BEDROOM — Room Illustration
      ========================================================================= */
   .bedroom-scene {
@@ -857,13 +1090,16 @@
      RESPONSIVE
      ========================================================================= */
   @media (max-width: 600px) {
-    .hub-header h1 { font-size: 38px; }
+    .hub-header h1 { font-size: 32px; }
+    .hub-header { margin-bottom: -4px; }
     .door { width: 200px; height: 360px; }
     .door-label { font-size: 24px; }
     .book-spread { grid-template-columns: 1fr; min-height: auto; }
     .book-spread::before { display: none; }
     .shelf-row { justify-content: center; }
     .photo-wall { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+    #photo-wall { padding-top: 70px; padding-left: 14px; padding-right: 14px; padding-bottom: 22px; }
+    .map { padding: 70px 20px 20px; }
     .room-inner { padding: 0; }
     .home-frame { top: 14px; left: 14px; width: 44px; height: 44px; }
   }
@@ -886,6 +1122,10 @@
 
   <!-- HUB -->
   <div id="hub" class="hide">
+    <div class="hub-header">
+      <h1>Ngôi Nhà Của Mẹ</h1>
+      <div class="greeting" id="greeting">— trưa, mặt trời trên cao —</div>
+    </div>
     <div class="house">
       <img src="images/Gemini_Generated_Image_netfaznetfaznetf.png" class="house-bg" alt=""/>
 
@@ -910,6 +1150,10 @@
       <div class="room-hot" style="left: 68%; top: 62%; width: 23%; height: 32%" onclick="enterRoom('garden')">
         <div class="room-tag">Vườn</div>
       </div>
+
+      <!-- Ambient sprites -->
+      <div class="hub-moth" style="top: 25%; right: 12%">&#x1FAB6;</div>
+      <div class="hub-moth" style="top: 18%; left: 15%; animation-delay: -3s">&#x1FAB6;</div>
     </div>
   </div>
 
@@ -1067,10 +1311,54 @@
         + '<div class="pin" data-pin="paris"><span class="d" style="background:#3a4f6e"></span><span class="pin-flag">🇫🇷</span>Paris</div>'
         + '<div class="pin" data-pin="tokyo"><span class="d" style="background:#3a4f6e"></span><span class="pin-flag">🇯🇵</span>Tokyo</div>'
         + '<div class="pin" data-pin="kyoto"><span class="d" style="background:#3a4f6e"></span><span class="pin-flag">🇯🇵</span>Kyoto</div>'
+        + '</div>'
+        + '<button class="pin-add-btn" onclick="openAddPinModal()">+ Thêm địa điểm</button>'
+        + '</div></div>'
+        + '<div class="pin-modal-overlay" id="pinModal">'
+        + '<div class="pin-modal">'
+        + '<h3>Thêm Địa Điểm Mới</h3>'
+        + '<label>Tên địa điểm</label>'
+        + '<input type="text" id="pinName" placeholder="vd: Đà Nẵng">'
+        + '<label>Loại</label>'
+        + '<select id="pinCat">'
+        + '<option value="đã sống">đã sống</option>'
+        + '<option value="đã ghé thăm">đã ghé thăm</option>'
+        + '<option value="ước mơ">ước mơ</option>'
+        + '</select>'
+        + '<label>Vĩ độ (Latitude)</label>'
+        + '<input type="number" step="any" id="pinLat" placeholder="vd: 16.05">'
+        + '<p class="pin-modal-hint">Nhấp vào bản đồ để chọn tọa độ</p>'
+        + '<label>Kinh độ (Longitude)</label>'
+        + '<input type="number" step="any" id="pinLng" placeholder="vd: 108.25">'
+        + '<label>Cờ (emoji)</label>'
+        + '<input type="text" id="pinFlag" placeholder="vd: 🇻🇳" maxlength="4">'
+        + '<label>Kỷ niệm</label>'
+        + '<textarea id="pinMemory" placeholder="Viết vài dòng kỷ niệm..."></textarea>'
+        + '<label>Hình ảnh</label>'
+        + '<input type="file" id="pinImages" accept="image/*" multiple onchange="previewPinImages(this)">'
+        + '<div class="pin-upload-preview" id="pinImagePreview"></div>'
+        + '<div class="pin-modal-actions">'
+        + '<button class="pin-modal-cancel" onclick="closeAddPinModal()">Hủy</button>'
+        + '<button class="pin-modal-save" onclick="saveNewPin()">Lưu</button>'
         + '</div></div></div>'
+        + '<input type="file" id="pinPhotoUpload" accept="image/*" multiple style="display:none" onchange="handlePinPhotoUpload(this)">'
+        + '<div class="pin-lightbox" id="pinLightbox" onclick="closePinLightbox()">'
+        + '<button class="pin-lightbox-close">&times;</button>'
+        + '<img id="pinLightboxImg" src="" alt="">'
+        + '<div class="pin-lightbox-caption" id="pinLightboxCap"></div>'
+        + '</div>'
     },
     family: {
-      body: '<div class="photo-wall" id="photo-wall">'
+      noScroll: true,
+      body: '<div class="family-scene" id="family-scene">'
+        + '<div class="scene">'
+        + '<img class="base" src="images/living_room_without_TV_and_images-removebg-preview.png" alt="Phòng Gia Đình"/>'
+        + '<a class="shelf-wall" href="#" onclick="event.preventDefault();openFamilyAlbum()" aria-label="Xem Album Ảnh">'
+        + '<img src="images/living_room_image_frame_shelf-removebg-preview.png" alt="Kệ ảnh gia đình"/>'
+        + '</a>'
+        + '</div>'
+        + '</div>'
+        + '<div class="photo-wall" id="photo-wall" style="display:none">'
         + '<div class="photo-status">Đang tải ảnh...</div>'
         + '</div>'
     },
@@ -1097,7 +1385,7 @@
     rv.classList.add('show');
     if (r.noScroll) rv.style.overflow = 'hidden';
     else rv.style.overflow = '';
-    if (key === 'family') loadFamilyPhotos();
+    /* family photos loaded via openFamilyAlbum() */
     if (key === 'map') buildWorldMap();
   }
 
@@ -1149,6 +1437,12 @@
     setTOD(tod);
   })();
 
+  /* ── Skip door if arriving via #hub ────────────────────────────── */
+  if (window.location.hash === '#hub') {
+    document.getElementById('doorScreen').classList.add('gone');
+    document.getElementById('hub').classList.remove('hide');
+  }
+
   /* ── Supabase ───────────────────────────────────────────────── */
   var SUPABASE_URL = 'https://cqkeywtqberpegxorbna.supabase.co';
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxa2V5d3RxYmVycGVneG9yYm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MzEyMTMsImV4cCI6MjA5MzIwNzIxM30.xj_utioyHM8p2-SpWudvjfam1ZoRmKIXbI-4HTkoXEA';
@@ -1162,6 +1456,16 @@
       return;
     }
     sb = lib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+
+  /* ── Family Room: scene → album ───────────────────── */
+  function openFamilyAlbum() {
+    var scene = document.getElementById('family-scene');
+    var wall = document.getElementById('photo-wall');
+    if (scene) scene.style.display = 'none';
+    if (wall) wall.style.display = '';
+    document.getElementById('room-view').style.overflow = '';
+    loadFamilyPhotos();
   }
 
   /* ── Family Photos (local images) ─────────────────── */
@@ -1250,9 +1554,9 @@
     leafletMap = L.map(el, {
       center: [20, 80],
       zoom: 2,
-      minZoom: 2,
+      minZoom: 1,
       maxZoom: 10,
-      scrollWheelZoom: false,
+      scrollWheelZoom: true,
       attributionControl: false
     });
 
@@ -1277,21 +1581,7 @@
 
     // Add pins
     MAP_PINS.forEach(function(p) {
-      var extraClass = p.cat === 'ước mơ' ? 'pin-dream' : '';
-      var icon = L.divIcon({
-        className: extraClass,
-        html: '<div class="leaflet-pin" style="background:' + p.color + '"></div>',
-        iconSize: [18, 18],
-        iconAnchor: [9, 18],
-        popupAnchor: [0, -18]
-      });
-      var popupHtml = '<strong>' + p.name + '</strong>'
-        + '<span class="pin-cat">' + p.cat + '</span>'
-        + '<div class="pin-memory">' + p.memory + '</div>';
-      var marker = L.marker([p.lat, p.lng], { icon: icon })
-        .bindPopup(popupHtml)
-        .addTo(leafletMap);
-      mapMarkers[p.id] = marker;
+      addPinToMap(p);
     });
 
     // Fit bounds to show all pins
@@ -1300,17 +1590,122 @@
     }));
     leafletMap.fitBounds(group.getBounds().pad(0.3));
 
-    // Wire up pin badge clicks to fly to marker
+    // Wire up pin badge clicks and add delete buttons
     document.querySelectorAll('.pin[data-pin]').forEach(function(el) {
+      var id = el.getAttribute('data-pin');
+      // Add delete button
+      var delBtn = document.createElement('button');
+      delBtn.className = 'pin-delete';
+      delBtn.title = 'Xóa';
+      delBtn.textContent = '✕';
+      delBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        removePin(id, el);
+      });
+      el.appendChild(delBtn);
+      // Fly to marker on click
       el.addEventListener('click', function() {
-        var id = el.getAttribute('data-pin');
         var m = mapMarkers[id];
         if (m && leafletMap) {
           leafletMap.flyTo(m.getLatLng(), 7, { duration: 1.2 });
-          setTimeout(function() { m.openPopup(); }, 600);
+          setTimeout(function() { m.pinClicked = true; m.openPopup(); }, 600);
         }
       });
     });
+  }
+
+  /* ── Add / Delete Pins ──────────────────────────────────── */
+  var CAT_COLORS = { 'đã sống': '#9c2a2a', 'đã ghé thăm': '#5a7a52', 'ước mơ': '#3a4f6e' };
+
+  function openAddPinModal() {
+    document.getElementById('pinModal').classList.add('show');
+    // Allow clicking map to set coordinates while modal is open
+    if (leafletMap) {
+      leafletMap.once('click', function(e) {
+        document.getElementById('pinLat').value = e.latlng.lat.toFixed(4);
+        document.getElementById('pinLng').value = e.latlng.lng.toFixed(4);
+      });
+    }
+  }
+  function closeAddPinModal() {
+    document.getElementById('pinModal').classList.remove('show');
+    // Clear form
+    ['pinName','pinLat','pinLng','pinFlag','pinMemory'].forEach(function(id) {
+      document.getElementById(id).value = '';
+    });
+  }
+
+  function saveNewPin() {
+    var name = document.getElementById('pinName').value.trim();
+    var cat = document.getElementById('pinCat').value;
+    var lat = parseFloat(document.getElementById('pinLat').value);
+    var lng = parseFloat(document.getElementById('pinLng').value);
+    var flag = document.getElementById('pinFlag').value.trim() || '📍';
+    var memory = document.getElementById('pinMemory').value.trim();
+    if (!name || isNaN(lat) || isNaN(lng)) { alert('Vui lòng nhập tên và tọa độ.'); return; }
+
+    var id = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    var color = CAT_COLORS[cat] || '#5a7a52';
+    var pin = { id: id, name: name, lat: lat, lng: lng, color: color, cat: cat, memory: memory, flag: flag };
+    MAP_PINS.push(pin);
+    addPinToMap(pin);
+    addPinBadge(pin);
+    closeAddPinModal();
+    if (leafletMap) { leafletMap.flyTo([lat, lng], 6, { duration: 1 }); }
+  }
+
+  function addPinToMap(p) {
+    var extraClass = p.cat === 'ước mơ' ? 'pin-dream' : '';
+    var icon = L.divIcon({
+      className: extraClass,
+      html: '<div class="leaflet-pin" style="background:' + p.color + '"></div>',
+      iconSize: [18, 18], iconAnchor: [9, 18], popupAnchor: [0, -18]
+    });
+    var popupHtml = '<strong>' + p.name + '</strong>'
+      + '<span class="pin-cat">' + p.cat + '</span>'
+      + '<div class="pin-memory">' + p.memory + '</div>';
+    var marker = L.marker([p.lat, p.lng], { icon: icon })
+      .bindPopup(popupHtml)
+      .addTo(leafletMap);
+    marker.on('mouseover', function() { this.openPopup(); });
+    marker.pinClicked = false;
+    marker.on('click', function() { this.pinClicked = true; this.openPopup(); });
+    marker.on('mouseout', function() { if (!this.pinClicked) this.closePopup(); });
+    marker.on('popupclose', function() { this.pinClicked = false; });
+    mapMarkers[p.id] = marker;
+  }
+
+  function addPinBadge(p) {
+    var pinsContainer = document.querySelector('.pins');
+    if (!pinsContainer) return;
+    var badge = document.createElement('div');
+    badge.className = 'pin';
+    badge.setAttribute('data-pin', p.id);
+    badge.innerHTML = '<span class="d" style="background:' + p.color + '"></span>'
+      + '<span class="pin-flag">' + (p.flag || '📍') + '</span>'
+      + p.name
+      + '<button class="pin-delete" onclick="event.stopPropagation();removePin(\'' + p.id + '\',this.parentElement)" title="Xóa">✕</button>';
+    badge.addEventListener('click', function() {
+      var m = mapMarkers[p.id];
+      if (m && leafletMap) {
+        leafletMap.flyTo(m.getLatLng(), 7, { duration: 1.2 });
+        setTimeout(function() { m.pinClicked = true; m.openPopup(); }, 600);
+      }
+    });
+    pinsContainer.appendChild(badge);
+  }
+
+  function removePin(id, badgeEl) {
+    if (!confirm('Xóa địa điểm này?')) return;
+    // Remove from map
+    if (mapMarkers[id]) {
+      leafletMap.removeLayer(mapMarkers[id]);
+      delete mapMarkers[id];
+    }
+    // Remove from data
+    MAP_PINS = MAP_PINS.filter(function(p) { return p.id !== id; });
+    // Remove badge
+    if (badgeEl) badgeEl.remove();
   }
 
   function toggleFullscreen() {
