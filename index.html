@@ -1023,6 +1023,54 @@
   }
 
   /* =========================================================================
+     FAMILY ROOM — Living Room Scene (library-style layered images)
+     ========================================================================= */
+  .family-scene {
+    position: fixed; inset: 0; z-index: 45;
+    display: flex; align-items: center; justify-content: center;
+    background: #8B6040;
+    overflow: hidden;
+  }
+  .family-scene .scene {
+    position: relative;
+    width: min(95vw, 900px);
+    aspect-ratio: 4 / 3;
+    image-rendering: pixelated;
+  }
+  .family-scene .scene > img.base {
+    width: 100%; height: 100%;
+    display: block;
+    image-rendering: pixelated;
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .family-scene .shelf-wall {
+    position: absolute;
+    display: block;
+    cursor: pointer;
+    transition: filter 160ms ease, transform 160ms ease;
+    filter: drop-shadow(0 0 0 transparent);
+    z-index: 1;
+    top: 0; left: 0; width: 100%; height: 100%;
+  }
+  .family-scene .shelf-wall img {
+    width: 100%; height: 100%;
+    display: block;
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+  .family-scene .shelf-wall:hover,
+  .family-scene .shelf-wall:focus-visible {
+    filter:
+      drop-shadow(0 0 6px #ffe066)
+      drop-shadow(0 0 14px #ffd43b)
+      drop-shadow(0 0 24px rgba(255, 212, 59, 0.6));
+    transform: translateY(-2px);
+    outline: none;
+  }
+
+  /* =========================================================================
      BEDROOM — Room Illustration
      ========================================================================= */
   .bedroom-scene {
@@ -1301,7 +1349,16 @@
         + '</div>'
     },
     family: {
-      body: '<div class="photo-wall" id="photo-wall">'
+      noScroll: true,
+      body: '<div class="family-scene" id="family-scene">'
+        + '<div class="scene">'
+        + '<img class="base" src="images/living_room_without_TV_and_images-removebg-preview.png" alt="Phòng Gia Đình"/>'
+        + '<a class="shelf-wall" href="#" onclick="event.preventDefault();openFamilyAlbum()" aria-label="Xem Album Ảnh">'
+        + '<img src="images/living_room_image_frame_shelf-removebg-preview.png" alt="Kệ ảnh gia đình"/>'
+        + '</a>'
+        + '</div>'
+        + '</div>'
+        + '<div class="photo-wall" id="photo-wall" style="display:none">'
         + '<div class="photo-status">Đang tải ảnh...</div>'
         + '</div>'
     },
@@ -1328,7 +1385,7 @@
     rv.classList.add('show');
     if (r.noScroll) rv.style.overflow = 'hidden';
     else rv.style.overflow = '';
-    if (key === 'family') loadFamilyPhotos();
+    /* family photos loaded via openFamilyAlbum() */
     if (key === 'map') buildWorldMap();
   }
 
@@ -1380,6 +1437,12 @@
     setTOD(tod);
   })();
 
+  /* ── Skip door if arriving via #hub ────────────────────────────── */
+  if (window.location.hash === '#hub') {
+    document.getElementById('doorScreen').classList.add('gone');
+    document.getElementById('hub').classList.remove('hide');
+  }
+
   /* ── Supabase ───────────────────────────────────────────────── */
   var SUPABASE_URL = 'https://cqkeywtqberpegxorbna.supabase.co';
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxa2V5d3RxYmVycGVneG9yYm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MzEyMTMsImV4cCI6MjA5MzIwNzIxM30.xj_utioyHM8p2-SpWudvjfam1ZoRmKIXbI-4HTkoXEA';
@@ -1393,6 +1456,16 @@
       return;
     }
     sb = lib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+
+  /* ── Family Room: scene → album ───────────────────── */
+  function openFamilyAlbum() {
+    var scene = document.getElementById('family-scene');
+    var wall = document.getElementById('photo-wall');
+    if (scene) scene.style.display = 'none';
+    if (wall) wall.style.display = '';
+    document.getElementById('room-view').style.overflow = '';
+    loadFamilyPhotos();
   }
 
   /* ── Family Photos (local images) ─────────────────── */
