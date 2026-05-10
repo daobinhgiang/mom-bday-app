@@ -5,10 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sách của Bố</title>
   <style>
+    @font-face {
+      font-family: 'Lora';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('fonts/lora-v37-regular.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Lora';
+      font-style: italic;
+      font-weight: 400;
+      font-display: swap;
+      src: url('fonts/lora-v37-italic.woff') format('woff');
+    }
+    @font-face {
+      font-family: 'Patrick Hand';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('fonts/patrick-hand-v25-regular.woff2') format('woff2');
+    }
+
     html, body {
       margin: 0;
       min-height: 100vh;
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Lora', Georgia, serif;
       background:
         radial-gradient(ellipse at top, #6b4423 0%, #3e2410 70%, #2a1808 100%);
       color: #f4e3c1;
@@ -24,9 +46,10 @@
 
     h1 {
       text-align: center;
-      font-size: clamp(36px, 6vw, 64px);
+      font-family: 'Patrick Hand', 'Lora', Georgia, serif;
+      font-size: clamp(40px, 6.5vw, 70px);
       margin: 0 0 8px;
-      letter-spacing: 2px;
+      letter-spacing: 1px;
       color: #f4d990;
       text-shadow:
         0 2px 0 #2a1808,
@@ -200,7 +223,7 @@
 <body>
   <div class="wrap">
     <a class="back" href="library.html">&larr; Thư viện</a>
-    <h1>Sách của Bố</h1>
+    <h1>Sách Bố Viết</h1>
     <p class="subtitle">Hãy chọn một quyển để mở ra...</p>
 
     <div class="shelf-area" id="shelfArea">
