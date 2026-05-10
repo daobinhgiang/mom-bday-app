@@ -6,6 +6,8 @@
 <title>Ngôi Nhà Của Mẹ</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><text y='50' font-size='50'>🏠</text></svg>">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   /* Self-hosted fonts (no Google Fonts CDN dependency) */
   @font-face {
@@ -381,7 +383,7 @@
   #room-view.show { opacity: 1; pointer-events: auto; }
 
   .room-inner {
-    max-width: 880px; margin: 0 auto; padding: 28px 32px 80px;
+    width: 100%; margin: 0; padding: 0;
     min-height: 100vh;
     background: var(--wall-ochre);
     background-image:
@@ -392,7 +394,7 @@
 
   /* House icon in top-left = return to hub */
   .home-frame {
-    position: absolute; top: 22px; left: 24px;
+    position: fixed; top: 22px; left: 24px; z-index: 50;
     width: 56px; height: 56px;
     background: var(--wood-teak-dark);
     padding: 6px;
@@ -408,15 +410,8 @@
     padding: 2px; box-sizing: border-box;
   }
 
-  .room-title {
-    font-family: var(--font-hand); font-size: 64px;
-    color: var(--paper-cream); text-align: center;
-    margin: 6px 0 18px; line-height: 1.15; letter-spacing: -0.01em;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.18);
-  }
-  .room-desc {
-    font-family: var(--font-serif); font-style: italic; font-size: 16px;
-    color: rgba(244,234,215,0.85); text-align: center; margin: 0 0 36px;
+  #roomBody {
+    min-height: 100vh;
   }
 
   /* =========================================================================
@@ -566,27 +561,216 @@
     background: #ecdcb9;
     background-image:
       radial-gradient(ellipse at 30% 30%, rgba(168,117,56,0.12), transparent 60%),
-      radial-gradient(ellipse at 70% 70%, rgba(58,40,24,0.1), transparent 60%);
-    border: 1px solid rgba(58,40,24,0.18);
+      radial-gradient(ellipse at 70% 70%, rgba(58,40,24,0.1), transparent 60%),
+      url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    border: none;
     padding: 24px 28px;
-    box-shadow: var(--shadow-object);
+    box-shadow: none;
+    border-radius: 0;
+    position: relative;
+    min-height: 100vh;
+  }
+  /* Corner ornaments removed for full-screen layout */
+
+  /* Cartouche title banner */
+  .map-cartouche {
+    text-align: center;
+    margin-bottom: 16px;
+    position: relative;
+    padding: 8px 0;
+  }
+  .map-cartouche h3 {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #3a2818;
+    margin: 0;
+    display: inline-block;
+    padding: 4px 24px;
+    border: 1px solid rgba(58,40,24,0.25);
+    background: rgba(244,234,215,0.5);
+    position: relative;
+  }
+  .map-cartouche h3::before, .map-cartouche h3::after {
+    content: '';
+    position: absolute;
+    top: 50%; width: 40px; height: 1px;
+    background: rgba(58,40,24,0.25);
+  }
+  .map-cartouche h3::before { right: 100%; margin-right: 8px; }
+  .map-cartouche h3::after { left: 100%; margin-left: 8px; }
+  .map-subtitle {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 11px;
+    color: rgba(58,40,24,0.55);
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* Leaflet world map */
+  .map-container {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  #leaflet-map {
+    width: 100%;
+    height: 420px;
+    border-radius: 4px;
+    border: 2px solid rgba(58,40,24,0.25);
+    box-shadow: var(--shadow-object), inset 0 0 20px rgba(58,40,24,0.1);
+    filter: sepia(0.1) saturate(0.95);
+  }
+  /* Vignette overlay on map */
+  .map-vignette {
+    position: absolute;
+    inset: 0;
+    border-radius: 4px;
+    box-shadow: inset 0 0 60px rgba(58,40,24,0.25);
+    pointer-events: none;
+    z-index: 500;
+  }
+  @media (max-width: 600px) {
+    #leaflet-map { height: 280px; }
+  }
+
+  /* Compass rose */
+  .compass-rose {
+    position: absolute;
+    bottom: 16px; right: 16px;
+    width: 70px; height: 70px;
+    z-index: 500;
+    opacity: 0.7;
+    pointer-events: none;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.2));
+  }
+
+  /* Custom pin marker */
+  .leaflet-pin {
+    width: 18px; height: 18px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    border: 2px solid rgba(255,255,255,0.9);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+    position: relative;
+  }
+  .leaflet-pin::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.6);
+  }
+  /* Pulse animation for dream pins */
+  .pin-dream .leaflet-pin {
+    animation: pinPulse 2.5s ease-in-out infinite;
+  }
+  @keyframes pinPulse {
+    0%, 100% { box-shadow: 0 1px 4px rgba(0,0,0,0.35); }
+    50% { box-shadow: 0 0 8px 3px rgba(58,79,110,0.4); }
+  }
+
+  .leaflet-popup-content-wrapper {
+    border-radius: 4px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25) !important;
+  }
+  .leaflet-popup-content {
+    font-family: var(--font-serif);
+    font-size: 13px;
+    color: #3a2818;
+    margin: 10px 14px;
+    line-height: 1.5;
+  }
+  .leaflet-popup-content strong {
+    font-size: 14px;
+    display: block;
+    margin-bottom: 2px;
+  }
+  .leaflet-popup-content .pin-cat {
+    font-style: italic;
+    font-size: 11px;
+    color: rgba(58,40,24,0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .leaflet-popup-content .pin-memory {
+    margin-top: 4px;
+    font-style: italic;
+    font-size: 12px;
+    color: rgba(58,40,24,0.75);
+    border-top: 1px solid rgba(58,40,24,0.12);
+    padding-top: 4px;
+  }
+
+  /* Scale bar decoration */
+  .map-scale {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    justify-content: center;
+  }
+  .map-scale-bar {
+    display: flex;
+    height: 4px;
+  }
+  .map-scale-bar span {
+    width: 20px;
+    height: 4px;
+  }
+  .map-scale-bar span:nth-child(odd) { background: rgba(58,40,24,0.4); }
+  .map-scale-bar span:nth-child(even) { background: rgba(58,40,24,0.15); }
+  .map-scale-label {
+    font-family: var(--font-serif);
+    font-size: 9px;
+    color: rgba(58,40,24,0.45);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .map-legend {
+    display: flex; gap: 18px; margin-bottom: 14px; flex-wrap: wrap;
+    justify-content: center;
+    padding: 8px 16px;
+    background: rgba(244,234,215,0.4);
+    border: 1px solid rgba(58,40,24,0.12);
     border-radius: 2px;
   }
-  .map-legend { display: flex; gap: 18px; margin-bottom: 14px; flex-wrap: wrap; }
   .leg { display: flex; gap: 6px; align-items: center; font-family: var(--font-serif); font-style: italic; font-size: 12px; color: var(--ink-soft); }
-  .leg .d { width: 10px; height: 10px; border-radius: 50%; }
-  .pins { display: flex; flex-wrap: wrap; gap: 8px; }
+  .leg .d { width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(58,40,24,0.2); }
+
+  /* Pin list section */
+  .pins-section {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(58,40,24,0.15);
+  }
+  .pins-section-title {
+    font-family: var(--font-serif);
+    font-size: 11px;
+    color: rgba(58,40,24,0.5);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .pins { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
   .pin {
     background: var(--paper-cream); border: 1px solid rgba(58,40,24,0.2);
     padding: 6px 12px 6px 8px; border-radius: 999px;
-    font-family: var(--font-serif); font-size: 14px; color: var(--ink);
+    font-family: var(--font-serif); font-size: 13px; color: var(--ink);
     display: flex; gap: 8px; align-items: center;
     box-shadow: var(--shadow-paper);
-    transition: transform var(--dur-base) var(--ease-settle);
-    cursor: default;
+    transition: transform var(--dur-base) var(--ease-settle), box-shadow var(--dur-base) var(--ease-settle);
+    cursor: pointer;
   }
-  .pin:hover { transform: rotate(-1deg) scale(1.03); }
-  .pin .d { width: 10px; height: 10px; border-radius: 50%; }
+  .pin:hover { transform: rotate(-1deg) scale(1.05); box-shadow: 0 2px 8px rgba(58,40,24,0.2); }
+  .pin .d { width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(58,40,24,0.15); }
+  .pin .pin-flag { font-size: 14px; line-height: 1; }
 
   /* =========================================================================
      FAMILY ROOM — Photo Wall
@@ -621,6 +805,28 @@
     display: block;
     background: linear-gradient(160deg, #b58860, #5e3a1a);
   }
+  /* Photo lightbox */
+  .photo-lightbox {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(10,8,4,0.92);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 12px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+    cursor: zoom-out;
+  }
+  .photo-lightbox.show { opacity: 1; pointer-events: auto; }
+  .photo-lightbox img {
+    max-width: 90vw; max-height: 80vh;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  }
+  .photo-lightbox .lb-cap {
+    font-family: var(--font-hand); font-size: 20px;
+    color: var(--paper-cream); text-align: center;
+  }
+
   .photo-status {
     grid-column: 1 / -1;
     text-align: center;
@@ -645,67 +851,20 @@
     object-fit: contain;
     display: block;
   }
-  .bedroom-bookshelf {
-    position: absolute;
-    top: 5%; left: 3%;
-    width: 38%;
-    cursor: pointer;
-    transition: transform var(--dur-base) var(--ease-settle), filter var(--dur-base) var(--ease-settle);
-  }
-  .bedroom-bookshelf:hover {
-    transform: scale(1.04) rotate(-0.5deg);
-    filter: drop-shadow(0 0 18px rgba(232,179,74,0.55)) drop-shadow(0 0 40px rgba(244,210,122,0.35));
-  }
-  .bedroom-bookshelf img {
-    width: 100%; height: auto; display: block;
-    image-rendering: pixelated;
-  }
-  .bedroom-bookshelf svg {
-    position: absolute; inset: 0; width: 100%; height: 100%;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity var(--dur-base) var(--ease-settle);
-  }
-  .bedroom-bookshelf:hover svg { opacity: 1; }
 
-  /* =========================================================================
-     FAREWELL SCREEN
-     ========================================================================= */
-  .farewell-screen {
-    position: fixed; inset: 0; z-index: 80;
-    background: radial-gradient(ellipse at 50% 65%, rgba(232,179,74,0.18), rgba(43,58,82,0.95) 60%);
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px;
-    opacity: 0; pointer-events: none;
-    transition: opacity 1200ms var(--ease-settle);
-  }
-  .farewell-screen.show { opacity: 1; pointer-events: auto; }
-  .farewell-screen .lan {
-    width: 60px; height: 90px;
-    filter: drop-shadow(0 0 24px var(--lantern-glow)) drop-shadow(0 0 50px rgba(232,179,74,0.6));
-    animation: flicker 5.4s ease-in-out infinite;
-  }
-  .farewell-screen .text {
-    font-family: var(--font-serif); font-style: italic; font-size: 32px;
-    color: var(--lantern-glow); letter-spacing: 0.04em;
-  }
-  .farewell-screen .sub {
-    font-family: var(--font-hand); font-size: 22px;
-    color: rgba(244,234,215,0.6);
-  }
 
   /* =========================================================================
      RESPONSIVE
      ========================================================================= */
   @media (max-width: 600px) {
     .hub-header h1 { font-size: 38px; }
-    .room-title { font-size: 42px; }
     .door { width: 200px; height: 360px; }
     .door-label { font-size: 24px; }
     .book-spread { grid-template-columns: 1fr; min-height: auto; }
     .book-spread::before { display: none; }
     .shelf-row { justify-content: center; }
     .photo-wall { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
-    .room-inner { padding: 20px 16px 60px; }
+    .room-inner { padding: 0; }
     .home-frame { top: 14px; left: 14px; width: 44px; height: 44px; }
   }
 </style>
@@ -760,8 +919,6 @@
       <div class="home-frame" onclick="goHome()" title="về nhà">
         <img src="assets/house-glyph.svg" alt="về nhà"/>
       </div>
-      <h2 class="room-title" id="roomTitle"></h2>
-      <p class="room-desc" id="roomDesc"></p>
       <div id="roomBody"></div>
     </div>
   </div>
@@ -785,7 +942,6 @@
   <div class="toolbar">
     <button id="muteBtn" title="tắt âm" onclick="toggleMute()">&#9834;</button>
     <button id="todBtn" title="đổi giờ trong ngày" onclick="cycleTOD()">&#9788;</button>
-    <button title="đóng cửa, hẹn ngày mai" onclick="farewell()">&#10005;</button>
   </div>
 
   <!-- AMBIENT PILL -->
@@ -794,16 +950,16 @@
   <!-- FULLSCREEN TOGGLE -->
   <button class="fs-btn" id="fsBtn" onclick="toggleFullscreen()" title="Toàn màn hình">&#9974;</button>
 
+  <!-- PHOTO LIGHTBOX -->
+  <div class="photo-lightbox" id="photoLightbox" onclick="closeLightbox()">
+    <img id="lbImg" src="" alt=""/>
+    <div class="lb-cap" id="lbCap"></div>
+  </div>
+
   <!-- OVERLAYS -->
   <div class="light-overlay"></div>
   <div class="grain-overlay"></div>
 
-  <!-- FAREWELL -->
-  <div class="farewell-screen" id="farewell">
-    <img src="assets/lantern.svg" class="lan" alt=""/>
-    <div class="text">Hẹn gặp Mẹ ngày mai.</div>
-    <div class="sub">— ngủ ngon, Mẹ —</div>
-  </div>
 </div>
 
 <script>
@@ -848,8 +1004,6 @@
   /* ── Rooms ────────────────────────────────────────────────────── */
   var ROOM_DATA = {
     library: {
-      title: 'Thư Viện',
-      desc: 'Mỗi cuốn sách là kỷ niệm từ một người trong gia đình.',
       body: '<div class="shelf"><div class="shelf-row">'
         + '<div class="book has-new" style="background:#9c2a2a" onclick="openBook(\'Cuốn sách của Con Trai\',\'Mẹ ơi, con nhớ ngày Mẹ đưa con đi học ngày đầu tiên...\',\'Cái cặp con thì nặng quá, mà tay Mẹ thì ấm. Con không nhớ tên cô giáo, nhưng nhớ mùi cơm Mẹ gói cho con buổi trưa hôm đó.\',\'— Con Trai, Tháng Tư 2025\')">Con Trai</div>'
         + '<div class="book" style="background:#5a7a52" onclick="openBook(\'Cuốn sách của Con Gái\',\'Mẹ luôn là người đầu tiên con gọi khi con cần lời khuyên.\',\'Hôm qua con gọi Mẹ ba lần, không phải vì con buồn — mà vì con muốn nghe Mẹ nói "ừ con".\',\'— Con Gái, Tháng Ba 2025\')">Con Gái</div>'
@@ -860,8 +1014,6 @@
         + '</div></div><div class="plank"></div>'
     },
     music: {
-      title: 'Phòng Nhạc',
-      desc: 'Những bài hát mà mọi người liên tưởng đến Mẹ, kèm lời nhắn yêu thương.',
       body: '<div class="music-layout">'
         + '<div class="turntable"><div class="platter" id="platter"></div><div class="arm" id="arm"></div></div>'
         + '<div class="songs">'
@@ -872,57 +1024,63 @@
         + '</div></div>'
     },
     map: {
-      title: 'Phòng Bản Đồ',
-      desc: 'Những nơi Mẹ đã sống, đã ghé thăm, và những nơi Mẹ ước mơ sẽ đến.',
       body: '<div class="map">'
         + '<div class="map-legend">'
         + '<div class="leg"><span class="d" style="background:#9c2a2a"></span>đã sống</div>'
         + '<div class="leg"><span class="d" style="background:#5a7a52"></span>đã ghé thăm</div>'
         + '<div class="leg"><span class="d" style="background:#3a4f6e"></span>ước mơ</div>'
         + '</div>'
+        + '<div class="map-container">'
+        + '<div id="leaflet-map"></div>'
+        + '<div class="map-vignette"></div>'
+        + '<svg class="compass-rose" viewBox="0 0 100 100">'
+        + '<g transform="translate(50,50)">'
+        + '<polygon points="0,-40 5,-10 -5,-10" fill="rgba(156,42,42,0.7)"/>'
+        + '<polygon points="0,40 5,10 -5,10" fill="rgba(58,40,24,0.35)"/>'
+        + '<polygon points="-40,0 -10,5 -10,-5" fill="rgba(58,40,24,0.35)"/>'
+        + '<polygon points="40,0 10,5 10,-5" fill="rgba(58,40,24,0.35)"/>'
+        + '<polygon points="0,-40 3,-12 -3,-12" fill="rgba(156,42,42,0.5)" transform="rotate(45)"/>'
+        + '<polygon points="0,40 3,12 -3,12" fill="rgba(58,40,24,0.2)" transform="rotate(45)"/>'
+        + '<polygon points="0,-40 3,-12 -3,-12" fill="rgba(58,40,24,0.2)" transform="rotate(-45)"/>'
+        + '<polygon points="0,40 3,12 -3,12" fill="rgba(58,40,24,0.2)" transform="rotate(-45)"/>'
+        + '<circle r="4" fill="rgba(58,40,24,0.4)"/>'
+        + '<circle r="2" fill="#ecdcb9"/>'
+        + '<text y="-42" text-anchor="middle" font-size="8" font-family="serif" fill="rgba(156,42,42,0.7)" font-weight="bold">N</text>'
+        + '<text y="48" text-anchor="middle" font-size="7" font-family="serif" fill="rgba(58,40,24,0.4)">S</text>'
+        + '<text x="44" y="3" text-anchor="middle" font-size="7" font-family="serif" fill="rgba(58,40,24,0.4)">E</text>'
+        + '<text x="-44" y="3" text-anchor="middle" font-size="7" font-family="serif" fill="rgba(58,40,24,0.4)">W</text>'
+        + '</g></svg>'
+        + '</div>'
+        + '<div class="map-scale"><span class="map-scale-label">0</span><div class="map-scale-bar"><span></span><span></span><span></span><span></span><span></span><span></span></div><span class="map-scale-label">km</span></div>'
+        + '<div class="pins-section">'
+        + '<div class="pins-section-title">Ghim trên bản đồ</div>'
         + '<div class="pins">'
-        + '<div class="pin"><span class="d" style="background:#9c2a2a"></span>Sài Gòn</div>'
-        + '<div class="pin"><span class="d" style="background:#9c2a2a"></span>Hà Nội</div>'
-        + '<div class="pin"><span class="d" style="background:#9c2a2a"></span>Huế</div>'
-        + '<div class="pin"><span class="d" style="background:#5a7a52"></span>Đà Lạt</div>'
-        + '<div class="pin"><span class="d" style="background:#5a7a52"></span>Nha Trang</div>'
-        + '<div class="pin"><span class="d" style="background:#5a7a52"></span>Hội An</div>'
-        + '<div class="pin"><span class="d" style="background:#5a7a52"></span>Phú Quốc</div>'
-        + '<div class="pin"><span class="d" style="background:#5a7a52"></span>Vũng Tàu</div>'
-        + '<div class="pin"><span class="d" style="background:#3a4f6e"></span>Vịnh Hạ Long</div>'
-        + '<div class="pin"><span class="d" style="background:#3a4f6e"></span>Paris</div>'
-        + '<div class="pin"><span class="d" style="background:#3a4f6e"></span>Tokyo</div>'
-        + '<div class="pin"><span class="d" style="background:#3a4f6e"></span>Kyoto</div>'
-        + '</div></div>'
+        + '<div class="pin" data-pin="saigon"><span class="d" style="background:#9c2a2a"></span><span class="pin-flag">🇻🇳</span>Sài Gòn</div>'
+        + '<div class="pin" data-pin="hanoi"><span class="d" style="background:#9c2a2a"></span><span class="pin-flag">🇻🇳</span>Hà Nội</div>'
+        + '<div class="pin" data-pin="hue"><span class="d" style="background:#9c2a2a"></span><span class="pin-flag">🇻🇳</span>Huế</div>'
+        + '<div class="pin" data-pin="dalat"><span class="d" style="background:#5a7a52"></span><span class="pin-flag">🇻🇳</span>Đà Lạt</div>'
+        + '<div class="pin" data-pin="nhatrang"><span class="d" style="background:#5a7a52"></span><span class="pin-flag">🇻🇳</span>Nha Trang</div>'
+        + '<div class="pin" data-pin="hoian"><span class="d" style="background:#5a7a52"></span><span class="pin-flag">🇻🇳</span>Hội An</div>'
+        + '<div class="pin" data-pin="phuquoc"><span class="d" style="background:#5a7a52"></span><span class="pin-flag">🇻🇳</span>Phú Quốc</div>'
+        + '<div class="pin" data-pin="vungtau"><span class="d" style="background:#5a7a52"></span><span class="pin-flag">🇻🇳</span>Vũng Tàu</div>'
+        + '<div class="pin" data-pin="halong"><span class="d" style="background:#3a4f6e"></span><span class="pin-flag">🇻🇳</span>Vịnh Hạ Long</div>'
+        + '<div class="pin" data-pin="paris"><span class="d" style="background:#3a4f6e"></span><span class="pin-flag">🇫🇷</span>Paris</div>'
+        + '<div class="pin" data-pin="tokyo"><span class="d" style="background:#3a4f6e"></span><span class="pin-flag">🇯🇵</span>Tokyo</div>'
+        + '<div class="pin" data-pin="kyoto"><span class="d" style="background:#3a4f6e"></span><span class="pin-flag">🇯🇵</span>Kyoto</div>'
+        + '</div></div></div>'
     },
     family: {
-      title: 'Phòng Gia Đình',
-      desc: 'Bức tường đầy ảnh và hình vẽ.',
       body: '<div class="photo-wall" id="photo-wall">'
         + '<div class="photo-status">Đang tải ảnh...</div>'
         + '</div>'
     },
     bedroom: {
-      title: '',
-      desc: '',
       noScroll: true,
       body: '<div class="bedroom-scene">'
         + '<img src="images/Gemini_Generated_Image_83o06e83o06e83o0.png" alt="Phòng ngủ của Mẹ"/>'
-        + '<div class="bedroom-bookshelf">'
-        +   '<img src="images/bookshelf.png" alt="Tủ sách"/>'
-        +   '<svg viewBox="0 0 100 100" preserveAspectRatio="none"><defs>'
-        +     '<radialGradient id="shelfGlow" cx="50%" cy="50%" r="55%">'
-        +       '<stop offset="0%" stop-color="#f4d27a" stop-opacity="0.3"/>'
-        +       '<stop offset="70%" stop-color="#e8b34a" stop-opacity="0.12"/>'
-        +       '<stop offset="100%" stop-color="#e8b34a" stop-opacity="0"/>'
-        +     '</radialGradient></defs>'
-        +   '<rect width="100" height="100" fill="url(#shelfGlow)"/></svg>'
-        + '</div>'
         + '</div>'
     },
     garden: {
-      title: 'Vườn',
-      desc: 'Nơi cháu để lại tranh vẽ, hoa giấy, và những lời nhắn nhỏ.',
       body: '<div class="photo-wall">'
         + '<div class="frame" style="background:#5a7a52"><div class="photo p4"></div><div class="cap">"con yêu Bà"</div><div class="author">— bé An, 7 tuổi</div></div>'
         + '<div class="frame" style="background:#a14d2e"><div class="photo p5"></div><div class="cap">hoa giấy bé Minh tặng</div><div class="author">— bé Minh, 5 tuổi</div></div>'
@@ -934,15 +1092,13 @@
   function enterRoom(key) {
     var r = ROOM_DATA[key];
     var rv = document.getElementById('room-view');
-    document.getElementById('roomTitle').textContent = r.title || '';
-    document.getElementById('roomTitle').style.display = r.title ? '' : 'none';
-    document.getElementById('roomDesc').textContent = r.desc || '';
-    document.getElementById('roomDesc').style.display = r.desc ? '' : 'none';
+    /* title and desc hidden — room content is full-screen */
     document.getElementById('roomBody').innerHTML = r.body;
     rv.classList.add('show');
     if (r.noScroll) rv.style.overflow = 'hidden';
     else rv.style.overflow = '';
     if (key === 'family') loadFamilyPhotos();
+    if (key === 'map') buildWorldMap();
   }
 
   function goHome() {
@@ -982,13 +1138,6 @@
     document.getElementById('muteBtn').innerHTML = muted ? '&#9834;' : '&#9835;';
   }
 
-  function farewell() {
-    document.getElementById('farewell').classList.add('show');
-    setTimeout(function() {
-      document.getElementById('farewell').classList.remove('show');
-    }, 4500);
-  }
-
   /* ── Init: pick time of day from real clock ────────────────────── */
   (function initTOD() {
     var h = new Date().getHours();
@@ -1015,14 +1164,40 @@
     sb = lib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
 
-  /* ── Family Photos (from Supabase Storage) ─────────────────── */
+  /* ── Family Photos (local images) ─────────────────── */
   var familyPhotosLoaded = false;
 
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, function(c) {
-      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
-    });
-  }
+  var FAMILY_PHOTOS = [
+    { src: 'images/family-gatherings/family-dinner-restaurant.jpg', cap: 'Ăn tối cả nhà' },
+    { src: 'images/family-gatherings/family-cooking-together.jpg', cap: 'Nấu ăn cùng nhau' },
+    { src: 'images/family-gatherings/family-dinner-at-home.jpg', cap: 'Bữa cơm gia đình' },
+    { src: 'images/family-gatherings/family-car-selfie.jpg', cap: 'Selfie trên xe' },
+    { src: 'images/family-gatherings/family-fansipan.jpg', cap: 'Cả nhà ở Fansipan' },
+    { src: 'images/family-gatherings/family-eating-out.jpg', cap: 'Đi ăn cùng gia đình' },
+    { src: 'images/family-gatherings/family-formal-event-1.jpg', cap: 'Tiệc gia đình' },
+    { src: 'images/family-gatherings/family-formal-event-2.jpg', cap: 'Tiệc gia đình' },
+    { src: 'images/mom-and-son/mom-son-selfie-bed.jpg', cap: 'Mẹ và con' },
+    { src: 'images/mom-and-son/mom-son-airport.jpg', cap: 'Mẹ con ở sân bay' },
+    { src: 'images/mom-and-son/mom-son-walking.jpg', cap: 'Đi dạo cùng Mẹ' },
+    { src: 'images/mom-and-son/mom-son-facemask.jpg', cap: 'Đắp mặt nạ cùng Mẹ' },
+    { src: 'images/mom-and-son/mom-son-city-selfie.jpg', cap: 'Mẹ con đi chơi' },
+    { src: 'images/mom-and-son/mom-son-street-selfie.jpg', cap: 'Mẹ con selfie' },
+    { src: 'images/mom-and-son/mom-son-sleeping.jpg', cap: 'Mẹ ngủ rồi' },
+    { src: 'images/mom-and-son/mom-dad-outdoor-selfie.jpg', cap: 'Bố Mẹ đi dạo' },
+    { src: 'images/travel/family-at-monument.jpg', cap: 'Tượng đài Mẹ Việt Nam' },
+    { src: 'images/travel/mom-by-the-water-1.jpg', cap: 'Mẹ bên sông' },
+    { src: 'images/travel/mom-by-the-water-2.jpg', cap: 'Mẹ bên sông' },
+    { src: 'images/travel/mom-walking-neighborhood.jpg', cap: 'Mẹ đi dạo' },
+    { src: 'images/travel/mom-dad-train.jpg', cap: 'Bố Mẹ đi tàu' },
+    { src: 'images/travel/mom-dad-train-2.jpg', cap: 'Bố Mẹ đi tàu' },
+    { src: 'images/travel/mom-picking-lychees.jpg', cap: 'Mẹ hái vải' },
+    { src: 'images/milestones/graduation-family.jpg', cap: 'Lễ tốt nghiệp' },
+    { src: 'images/milestones/prom-mom-and-son.jpg', cap: 'Prom với Mẹ' },
+    { src: 'images/milestones/prom-mom-and-son-2.jpg', cap: 'Prom với Mẹ' },
+    { src: 'images/milestones/school-event-vas.jpg', cap: 'Sự kiện ở trường VAS' },
+    { src: 'images/milestones/mom-daughter-heart-hands.png', cap: 'Mẹ và con gái' },
+    { src: 'images/everyday/mom-coffee-laugh.jpg', cap: 'Mẹ uống cà phê' }
+  ];
 
   function loadFamilyPhotos() {
     if (familyPhotosLoaded) return;
@@ -1031,42 +1206,110 @@
     var wall = document.getElementById('photo-wall');
     if (!wall) return;
 
-    initSupabase();
-    if (!sb) {
-      wall.innerHTML = '<div class="photo-status">Chưa kết nối Supabase.</div>';
-      familyPhotosLoaded = false;
-      return;
-    }
+    wall.innerHTML = FAMILY_PHOTOS.map(function(p) {
+      return '<div class="frame" onclick="openLightbox(\'' + p.src.replace(/'/g, "\\'") + '\',\'' + p.cap.replace(/'/g, "\\'") + '\')">'
+        + '<img src="' + p.src + '" alt="' + p.cap + '" loading="lazy">'
+        + '<div class="cap">' + p.cap + '</div>'
+        + '</div>';
+    }).join('');
+  }
 
-    sb.storage.from('family-photos').list('', {
-      limit: 100,
-      sortBy: { column: 'created_at', order: 'desc' }
-    }).then(function(result) {
-      if (result.error) throw result.error;
+  /* ── Photo Lightbox ──────────────────────────────────────── */
+  function openLightbox(src, cap) {
+    document.getElementById('lbImg').src = src;
+    document.getElementById('lbCap').textContent = cap;
+    document.getElementById('photoLightbox').classList.add('show');
+  }
+  function closeLightbox() {
+    document.getElementById('photoLightbox').classList.remove('show');
+  }
 
-      var photos = (result.data || []).filter(function(f) {
-        return /\.(jpe?g|png|gif|webp)$/i.test(f.name);
+  /* ── World Map (Leaflet) ──────────────────────────────────── */
+  var leafletMap = null;
+  var mapMarkers = {};
+  var MAP_PINS = [
+    { id: 'saigon',   name: 'Sài Gòn',      lat: 10.82, lng: 106.63, color: '#9c2a2a', cat: 'đã sống',      memory: 'Nơi Mẹ sinh ra và lớn lên, đầy kỷ niệm tuổi thơ.' },
+    { id: 'hanoi',    name: 'Hà Nội',       lat: 21.03, lng: 105.85, color: '#9c2a2a', cat: 'đã sống',      memory: 'Phố cổ, hồ Gươm, mùa thu lá vàng rơi.' },
+    { id: 'hue',      name: 'Huế',          lat: 16.46, lng: 107.60, color: '#9c2a2a', cat: 'đã sống',      memory: 'Thành phố của bún bò và hoàng cung xưa.' },
+    { id: 'dalat',    name: 'Đà Lạt',       lat: 11.94, lng: 108.44, color: '#5a7a52', cat: 'đã ghé thăm',  memory: 'Thành phố sương mù, hoa và đồi thông.' },
+    { id: 'nhatrang', name: 'Nha Trang',    lat: 12.24, lng: 109.19, color: '#5a7a52', cat: 'đã ghé thăm',  memory: 'Biển xanh, cát trắng, nắng vàng.' },
+    { id: 'hoian',    name: 'Hội An',       lat: 15.88, lng: 108.33, color: '#5a7a52', cat: 'đã ghé thăm',  memory: 'Phố đèn lồng, đêm rằm trên sông Thu Bồn.' },
+    { id: 'phuquoc',  name: 'Phú Quốc',     lat: 10.23, lng: 103.97, color: '#5a7a52', cat: 'đã ghé thăm',  memory: 'Đảo ngọc, nước mắm, hoàng hôn tuyệt đẹp.' },
+    { id: 'vungtau',  name: 'Vũng Tàu',     lat: 10.35, lng: 107.08, color: '#5a7a52', cat: 'đã ghé thăm',  memory: 'Biển gần Sài Gòn, bánh khọt ngon nhất.' },
+    { id: 'halong',   name: 'Vịnh Hạ Long', lat: 20.95, lng: 107.10, color: '#3a4f6e', cat: 'ước mơ',       memory: 'Ngàn hòn đảo đá vôi giữa biển xanh ngọc.' },
+    { id: 'paris',    name: 'Paris',        lat: 48.86, lng: 2.35,   color: '#3a4f6e', cat: 'ước mơ',       memory: 'Tháp Eiffel, café ven đường, mùi bánh mì nướng.' },
+    { id: 'tokyo',    name: 'Tokyo',        lat: 35.68, lng: 139.69, color: '#3a4f6e', cat: 'ước mơ',       memory: 'Hoa anh đào, đền chùa, và mùa thu lá đỏ.' },
+    { id: 'kyoto',    name: 'Kyoto',        lat: 35.01, lng: 135.77, color: '#3a4f6e', cat: 'ước mơ',       memory: 'Vườn thiền tĩnh lặng, geisha trên phố cổ.' }
+  ];
+
+  function buildWorldMap() {
+    if (leafletMap) { leafletMap.invalidateSize(); return; }
+    var el = document.getElementById('leaflet-map');
+    if (!el || typeof L === 'undefined') return;
+
+    leafletMap = L.map(el, {
+      center: [20, 80],
+      zoom: 2,
+      minZoom: 2,
+      maxZoom: 10,
+      scrollWheelZoom: false,
+      attributionControl: false
+    });
+
+    // Watercolor base layer
+    L.tileLayer('https://watercolormaps.collection.cooperhewitt.org/tile/watercolor/{z}/{x}/{y}.jpg', {
+      maxZoom: 10
+    }).addTo(leafletMap);
+
+    // Country/region boundaries overlay (CartoDB, transparent bg with borders)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+      maxZoom: 10,
+      opacity: 0.25,
+      subdomains: 'abcd'
+    }).addTo(leafletMap);
+
+    // City & country labels overlay
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+      maxZoom: 10,
+      opacity: 0.6,
+      subdomains: 'abcd'
+    }).addTo(leafletMap);
+
+    // Add pins
+    MAP_PINS.forEach(function(p) {
+      var extraClass = p.cat === 'ước mơ' ? 'pin-dream' : '';
+      var icon = L.divIcon({
+        className: extraClass,
+        html: '<div class="leaflet-pin" style="background:' + p.color + '"></div>',
+        iconSize: [18, 18],
+        iconAnchor: [9, 18],
+        popupAnchor: [0, -18]
       });
+      var popupHtml = '<strong>' + p.name + '</strong>'
+        + '<span class="pin-cat">' + p.cat + '</span>'
+        + '<div class="pin-memory">' + p.memory + '</div>';
+      var marker = L.marker([p.lat, p.lng], { icon: icon })
+        .bindPopup(popupHtml)
+        .addTo(leafletMap);
+      mapMarkers[p.id] = marker;
+    });
 
-      if (photos.length === 0) {
-        wall.innerHTML = '<div class="photo-status">Chưa có ảnh trong thư mục.</div>';
-        return;
-      }
+    // Fit bounds to show all pins
+    var group = L.featureGroup(MAP_PINS.map(function(p) {
+      return L.marker([p.lat, p.lng]);
+    }));
+    leafletMap.fitBounds(group.getBounds().pad(0.3));
 
-      wall.innerHTML = photos.map(function(f) {
-        var raw = f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
-        var caption = escapeHtml(raw.charAt(0).toUpperCase() + raw.slice(1));
-        var src = SUPABASE_URL
-          + '/storage/v1/object/public/family-photos/'
-          + encodeURIComponent(f.name);
-        return '<div class="frame">'
-          + '<img src="' + src + '" alt="' + caption + '" loading="lazy">'
-          + '<div class="cap">' + caption + '</div>'
-          + '</div>';
-      }).join('');
-    }).catch(function(err) {
-      familyPhotosLoaded = false;
-      wall.innerHTML = '<div class="photo-status">Không tải được ảnh. (' + escapeHtml(err.message || err) + ')</div>';
+    // Wire up pin badge clicks to fly to marker
+    document.querySelectorAll('.pin[data-pin]').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var id = el.getAttribute('data-pin');
+        var m = mapMarkers[id];
+        if (m && leafletMap) {
+          leafletMap.flyTo(m.getLatLng(), 7, { duration: 1.2 });
+          setTimeout(function() { m.openPopup(); }, 600);
+        }
+      });
     });
   }
 

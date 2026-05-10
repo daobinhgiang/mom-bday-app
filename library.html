@@ -59,6 +59,27 @@
       outline: none;
     }
 
+    .back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      background: rgba(26, 26, 46, 0.75);
+      border: 1px solid rgba(255, 234, 167, 0.3);
+      color: #ffeaa7;
+      font-family: 'Georgia', serif;
+      font-size: 16px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 200ms ease, border-color 200ms ease;
+    }
+    .back-btn:hover {
+      background: rgba(26, 26, 46, 0.95);
+      border-color: #ffeaa7;
+    }
+
     /* Tune these positions to match your art. Each shelf is anchored by
        its top-left corner; height is a % of the scene height (width is auto
        so each shelf keeps its native aspect ratio). */
@@ -75,6 +96,7 @@
   </style>
 </head>
 <body>
+  <a class="back-btn" href="index.html">&#8592; Về Nhà</a>
   <div class="scene">
     <img class="base" src="images/library-room/library crop.png" alt="Library room" />
 
